@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J/s Enterprise</title>
+    <title>Shuttering Formwork Calculator (sqf)</title>
+    <style>
+        :root {
+            --primary: #5c8ddc;
+            --secondary: #1a1a1a;
+            --background: #3f0062;
+            --text-color: #55d5ff;
+            --card-bg: #a4a4a44c;
+            --accent: #4CAF50;
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 20px auto; 
+            padding: 20px; 
+            box-shadow: 0 0 10px #000; 
+            background: var(--background);
+            color: var(--text-color);
+        }
+        .form-group { 
+            background: var(--card-bg); 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .input-group label {
+            flex: 1;
+            font-weight: bold;
+        }
+        .input-group input {
+            flex: 2;
+            padding: 8px;
+            box-sizing: border-box; 
+            background: #4a4a4a;
+            color: var(--text-color);
+            border: 2px solid #555;
+        }
+        .input-duo {
+            display: flex;
+            gap: 5px;
+            flex: 2;
+        }
+        .input-duo input {
+            flex: 1;
+            width: auto;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 8px; 
+            box-sizing: border-box; 
+            margin-bottom: 10px;
+            background: #4a4a4a;
+            color: var(--text-color);
+            border: 2px solid #555;
+        }
+        select {
+            background: #4a4a4a;
+            color: var(--text-color);
+        }
+        input:focus { 
+            border: 2px solid var(--primary); 
+            outline: none;
+        }
+        button { 
+            background: linear-gradient(135deg, var(--primary), #3a62a8); 
+            color: white; 
+            padding: 12px 20px; 
+            border: none; 
+            cursor: pointer; 
+            margin-right: 10px; 
+            border-radius: 5px; 
+            font-weight: bold;
+        }
+        button:hover { 
+            transform: scale(1.03); 
+            transition: 0.2s; 
+        }
+        #result { 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3); 
+            background: var(--card-bg);
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-top: 20px;
+        }
+        .structure-type { 
+            margin: 20px 0; 
+            padding: 15px; 
+            background: #444; 
+            border-radius: 5px; 
+        }
+    </style>
+</head>
+<body>
+    <h2>Shuttering Formwork Material Estimator (Square Feet)</h2>
+    
+    <div class="form-group">
+        <label for="structureType">Select Structure Type:</label>
+        <select id="structureType" onchange="showStructureInputs()">
+            <option value="wall">Wall (Rectangular)</option>
+            <option value="beam">Beam</option>
+            <option value="column">Column (Rectangular)</option>
+            <option value="roundColumn">Column (Round)</option>
+            <option value="slab">Slab</option>
+            <option value="stair">Staircase</option>
+            <option value="custom">Custom Structure</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="wastage">Wastage Percentage (%):</label>
+        <input type="number" id="wastage" value="5" min="0" max="50" required>
+    </div>
+
+    <div class="form-group">
+        <label for="plywoodSize">Sheet Size (sqf, e.g., 4x8 for 4'x8'):</label>
+        <input type="text" id="plywoodSize" value="4x8" required>
+    </div>
+
+    <div class="form-group">
+        <label>Material Rate (Optional, ৳/sqf):</label>
+        <input type="number" id="materialRate" placeholder="Enter rate per square foot" step="0.01">
+    </div>
+
+    <div id="structureInputs">
+        <div class="structure-type" id="wallInputs">
+            <h4>Wall Dimensions</h4>
+            <div class="input-group">
+                <label for="wallLengthFt">Length:</label>
+                <div class="input-duo">
+                    <input type="number" id="wallLengthFt" step="1" placeholder="ft" value="10">
+                    <input type="number" id="wallLengthInch" step="1" placeholder="inch" min="0" max="11" value="0">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="wallHeightFt">Height:</label>
+                <div class="input-duo">
+                    <input type="number" id="wallHeightFt" step="1" placeholder="ft" value="8">
+                    <input type="number" id="wallHeightInch" step="1" placeholder="inch" min="0" max="11" value="0">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" onclick="calculateFormwork()">Calculate Materials</button>
+    <div class="form-group" style="margin-top: 20px;">
+        <button type="button" onclick="saveResults()">Save Results</button>
+        <button type="button" onclick="window.print()">Print Results</button>
+    </div>
+    <div id="result"></div>
+
+    <script>
+        // Convert ft and inches to a single feet value
+        function convertToFeet(ft, inch) {
+            const feet = parseFloat(ft) || 0;
+            const inches = parseFloat(inch) || 0;
+            return feet + inches / 12;
+        }
+
+        function showStructureInputs() {
+            const type = document.getElementById('structureType').value;
+            let inputs = '';
+
+            const dimensionTemplate = (label, idPrefix) => `
+                <div class="input-group">
+                    <label for="${idPrefix}Ft">${label}:</label>
+                    <div class="input-duo">
+                        <input type="number" id="${idPrefix}Ft" step="1" placeholder="ft" required>
+                        <input type="number" id="${idPrefix}Inch" step="1" placeholder="inch" min="0" max="11">
+                    </div>
+                </div>
+            `;
+            
+            const areaTemplate = (label, idPrefix) => `
+                <div class="input-group">
+                    <label for="${idPrefix}Ft">${label} (sqft):</label>
+                    <div class="input-duo">
+                        <input type="number" id="${idPrefix}Ft" step="0.1" placeholder="sqft" required>
+                    </div>
+                </div>
+            `;
+
+            switch(type) {
+                case 'wall':
+                    inputs = `
+                        <div class="structure-type" id="wallInputs">
+                            <h4>Wall Dimensions</h4>
+                            ${dimensionTemplate('Length', 'wallLength')}
+                            ${dimensionTemplate('Height', 'wallHeight')}
+                        </div>
+                    `;
+                    break;
+                case 'beam':
+                    inputs = `
+                        <div class="structure-type" id="beamInputs">
+                            <h4>Beam Dimensions</h4>
+                            <div class="input-group">
+                                <label for="beamCount">Number of Beams:</label>
+                                <input type="number" id="beamCount" min="1" value="1" required>
+                            </div>
+                            ${dimensionTemplate('Length', 'beamLength')}
+                            ${dimensionTemplate('Width', 'beamWidth')}
+                            ${dimensionTemplate('Height', 'beamHeight')}
+                        </div>
+                    `;
+                    break;
+                case 'column':
+                    inputs = `
+                        <div class="structure-type" id="columnInputs">
+                            <h4>Rectangular Column Dimensions</h4>
+                            <div class="input-group">
+                                <label for="colCount">Number of Columns:</label>
+                                <input type="number" id="colCount" min="1" value="1" required>
+                            </div>
+                            ${dimensionTemplate('Length', 'colLength')}
+                            ${dimensionTemplate('Width', 'colWidth')}
+                            ${dimensionTemplate('Height', 'colHeight')}
+                        </div>
+                    `;
+                    break;
+                case 'roundColumn':
+                    inputs = `
+                        <div class="structure-type" id="roundColumnInputs">
+                            <h4>Round Column Dimensions</h4>
+                            <div class="input-group">
+                                <label for="roundColCount">Number of Columns:</label>
+                                <input type="number" id="roundColCount" min="1" value="1" required>
+                            </div>
+                            ${dimensionTemplate('Diameter', 'roundColDiameter')}
+                            ${dimensionTemplate('Height', 'roundColHeight')}
+                        </div>
+                    `;
+                    break;
+                case 'slab':
+                    inputs = `
+                        <div class="structure-type" id="slabInputs">
+                            <h4>Slab Dimensions</h4>
+                            <div class="input-group">
+                                <label for="slabCount">Number of Slabs:</label>
+                                <input type="number" id="slabCount" min="1" value="1" required>
+                            </div>
+                            ${dimensionTemplate('Length', 'slabLength')}
+                            ${dimensionTemplate('Width', 'slabWidth')}
+                        </div>
+                    `;
+                    break;
+                case 'stair':
+                    inputs = `
+                        <div class="structure-type" id="stairInputs">
+                            <h4>Staircase Dimensions</h4>
+                            ${dimensionTemplate('Rise per Step', 'stairRise')}
+                            ${dimensionTemplate('Tread per Step', 'stairTread')}
+                            <div class="input-group">
+                                <label for="stairSteps">Number of Steps:</label>
+                                <input type="number" id="stairSteps" min="1" required>
+                            </div>
+                            ${dimensionTemplate('Width', 'stairWidth')}
+                        </div>
+                    `;
+                    break;
+                case 'custom':
+                    inputs = `
+                        <div class="structure-type">
+                            <h4>Custom Structure</h4>
+                            ${areaTemplate('Total Formwork Area', 'customArea')}
+                        </div>
+                    `;
+                    break;
+            }
+            document.getElementById('structureInputs').innerHTML = inputs;
+        }
+
+        function calculateFormwork() {
+            const type = document.getElementById('structureType').value;
+            const wastage = parseFloat(document.getElementById('wastage').value);
+            const plywoodSize = document.getElementById('plywoodSize').value.split('x').map(Number);
+            const materialRate = parseFloat(document.getElementById('materialRate').value) || 0;
+
+            if (plywoodSize.length !== 2 || plywoodSize.some(isNaN)) {
+                alert("Plywood size must be in format '4x8' (ft)");
+                return;
+            }
+
+            let formworkArea = 0;
+            let count = 1;
+
+            switch(type) {
+                case 'wall':
+                    const wallLength = convertToFeet(document.getElementById('wallLengthFt').value, document.getElementById('wallLengthInch').value);
+                    const wallHeight = convertToFeet(document.getElementById('wallHeightFt').value, document.getElementById('wallHeightInch').value);
+                    formworkArea = wallLength * wallHeight * 2; // 2 sides
+                    break;
+                case 'beam':
+                    count = parseInt(document.getElementById('beamCount').value) || 1;
+                    const beamL = convertToFeet(document.getElementById('beamLengthFt').value, document.getElementById('beamLengthInch').value);
+                    const beamW = convertToFeet(document.getElementById('beamWidthFt').value, document.getElementById('beamWidthInch').value);
+                    const beamH = convertToFeet(document.getElementById('beamHeightFt').value, document.getElementById('beamHeightInch').value);
+                    formworkArea = (2 * beamH + beamW) * beamL * count; // (2 sides + bottom) * number of beams
+                    break;
+                case 'column':
+                    count = parseInt(document.getElementById('colCount').value) || 1;
+                    const colL = convertToFeet(document.getElementById('colLengthFt').value, document.getElementById('colLengthInch').value);
+                    const colW = convertToFeet(document.getElementById('colWidthFt').value, document.getElementById('colWidthInch').value);
+                    const colH = convertToFeet(document.getElementById('colHeightFt').value, document.getElementById('colHeightInch').value);
+                    formworkArea = 2 * (colL + colW) * colH * count; // perimeter × height × number of columns
+                    break;
+                case 'roundColumn':
+                    count = parseInt(document.getElementById('roundColCount').value) || 1;
+                    const diameter = convertToFeet(document.getElementById('roundColDiameterFt').value, document.getElementById('roundColDiameterInch').value);
+                    const roundColH = convertToFeet(document.getElementById('roundColHeightFt').value, document.getElementById('roundColHeightInch').value);
+                    formworkArea = Math.PI * diameter * roundColH * count; // circumference × height × number of columns
+                    break;
+                case 'slab':
+                    count = parseInt(document.getElementById('slabCount').value) || 1;
+                    const slabL = convertToFeet(document.getElementById('slabLengthFt').value, document.getElementById('slabLengthInch').value);
+                    const slabW = convertToFeet(document.getElementById('slabWidthFt').value, document.getElementById('slabWidthInch').value);
+                    formworkArea = slabL * slabW * count; // top surface * number of slabs
+                    break;
+                case 'stair':
+                    const rise = convertToFeet(document.getElementById('stairRiseFt').value, document.getElementById('stairRiseInch').value);
+                    const tread = convertToFeet(document.getElementById('stairTreadFt').value, document.getElementById('stairTreadInch').value);
+                    const steps = parseInt(document.getElementById('stairSteps').value);
+                    const stairW = convertToFeet(document.getElementById('stairWidthFt').value, document.getElementById('stairWidthInch').value);
+                    formworkArea = (rise * steps * stairW) + (tread * steps * stairW); // risers + treads
+                    break;
+                case 'custom':
+                    const customArea = parseFloat(document.getElementById('customAreaFt').value);
+                    formworkArea = customArea;
+                    break;
+            }
+
+            const totalArea = formworkArea * (1 + wastage / 100);
+            const sheetArea = plywoodSize[0] * plywoodSize[1];
+            const sheetsNeeded = Math.ceil(totalArea / sheetArea);
+            const totalCost = materialRate * totalArea;
+
+            let resultHTML = `
+                <h3>Calculation Results</h3>
+                <p><strong>Structure Type:</strong> ${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+                <p><strong>Formwork Area:</strong> ${formworkArea.toFixed(2)} sqft</p>
+                <p><strong>Total Area (with ${wastage}% wastage):</strong> ${totalArea.toFixed(2)} sqft</p>
+                <p><strong>Plywood Sheets Needed:</strong> ${sheetsNeeded} (based on ${plywoodSize[0]}x${plywoodSize[1]} sqf sheets)</p>
+            `;
+            if (materialRate > 0) {
+                resultHTML += `<p><strong>Estimated Material Cost:</strong> ৳${totalCost.toFixed(2)}</p>`;
+            }
+
+            document.getElementById('result').innerHTML = resultHTML;
+        }
+
+        function saveResults() {
+            const resultElement = document.getElementById('result');
+            if (resultElement.innerHTML === '') {
+                alert("Please calculate the materials first.");
+                return;
+            }
+            const results = resultElement.innerHTML;
+            const blob = new Blob([results], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'formwork_calculation_results.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert("Results saved as 'formwork_calculation_results.html'");
+        }
+
+        showStructureInputs();
+    </script>
+    <div class="text-center p-4">
+                        Copyright © 2025-2026
+                        <a class="text-reset fw-bold" href="hossain_sabuj@hotmail.com">Powder by Sabuj@mail.</a>
+                        </div>
+</body>
+</html>
