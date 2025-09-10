@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shuttering/Formwork Rent Bill Creator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #560c8e;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 0;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .card-header {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-header i {
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+        }
+        
+        .btn-danger {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .bill-preview {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .bill-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .bill-header h2 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .bill-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .bill-to, .bill-from {
+            flex-basis: 48%;
+        }
+        
+        .bill-summary {
+            margin: 30px 0;
+        }
+        
+        .bill-footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #777;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .summary-row.total {
+            font-weight: bold;
+            font-size: 1.2em;
+            border-top: 2px solid var(--primary);
+            border-bottom: none;
+            margin-top: 10px;
+            color: var(--primary);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-buttons button {
+            flex: 1;
+        }
+        
+        .calculation-note {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-hard-hat"></i>
+                    <h1>Shuttering/Formwork Rent Bill Creator</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="app-container">
+            <div class="input-section">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user"></i>
+                        <h2>Customer Information</h2>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" placeholder="Enter customer name">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerAddress">Address</label>
+                        <textarea id="customerAddress" rows="3" placeholder="Enter customer address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerPhone">Phone Number</label>
+                        <input type="text" id="customerPhone" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerGST">GSTIN (if applicable)</label>
+                        <input type="text" id="customerGST" placeholder="Enter GSTIN">
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-cube"></i>
+                        <h2>Rental Items</h2>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemDescription">Description</label>
+                        <input type="text" id="itemDescription" placeholder="Item description">
+                    </div>
+                    <div class="form-group">
+                        <label for="itemSqft">Area (Sq Ft)</label>
+                        <input type="number" id="itemSqft" placeholder="Area in square feet" min="1" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="itemRate">Rate per Sq Ft (৳)</label>
+                        <input type="number" id="itemRate" placeholder="Rate per square foot" min="0" step="0.01">
+                        <p class="calculation-note">Amount = Area (Sq Ft) × Rate per Sq Ft</p>
+                    </div>
+                    <button class="btn btn-primary" id="addItem">Add Item</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-list"></i>
+                        <h2>Items List</h2>
+                    </div>
+                    <table id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Area (Sq Ft)</th>
+                                <th>Rate/Sq Ft</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Items will be added here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="bill-preview">
+                    <div class="bill-header">
+                        <h2>SHUTTERING/FORMWORK RENTAL INVOICE</h2>
+                        <p>Invoice #: <span id="invoiceNumber">INV-2025-001</span></p>
+                        <p>Date: <span id="invoiceDate"></span></p>
+                    </div>
+
+                    <div class="bill-details">
+                        <div class="bill-from">
+                            <h3>From:</h3>
+                            <p><strong>J/s Enterprise</strong></p>
+                            
+                            <p><strong> Construction & Shuttering Equipment supplier</strong></p>
+                            <p>18/2no. Water Works Road, Narayanganj, Bangladesh </p>
+                            <p>Phone: 01994316210</p>
+                            <p>GSTIN: 27ABCDE1234F1Z2</p>
+                        </div>
+
+                        <div class="bill-to">
+                            <h3>Bill To:</h3>
+                            <p id="previewCustomerName">Customer Name</p>
+                            <p id="previewCustomerAddress">Address</p>
+                            <p id="previewCustomerPhone">Phone</p>
+                            <p id="previewCustomerGST">GSTIN</p>
+                        </div>
+                    </div>
+
+                    <div class="bill-summary">
+                        <h3>Rental Summary</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Area (Sq Ft)</th>
+                                    <th>Rate/Sq Ft</th>
+                                    <th>Amount (৳)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewItems">
+                                <!-- Items will be added here dynamically -->
+                            </tbody>
+                        </table>
+
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="previewSubtotal">৳0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>GST (18%):</span>
+                            <span id="previewGST">৳0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total Amount:</span>
+                            <span id="previewTotal">৳0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="bill-footer">
+                        <p>Thank you for your business!</p>
+                        <p>Terms: Payment due within 15 days of invoice date</p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-success" id="generateBill">
+                            <i class="fas fa-file-invoice"></i> Generate Bill
+                        </button>
+                        <button class="btn btn-primary" id="printBill">
+                            <i class="fas fa-print"></i> Print Bill
+                        </button>
+                        <button class="btn btn-danger" id="resetForm">
+                            <i class="fas fa-trash"></i> Reset Form
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date
+            const now = new Date();
+            document.getElementById('invoiceDate').textContent = now.toLocaleDateString('en-IN');
+            
+            // Generate random invoice number
+            const randomNum = Math.floor(Math.random() * 1000);
+            document.getElementById('invoiceNumber').textContent = `INV-${now.getFullYear()}-${randomNum.toString().padStart(3, '0')}`;
+            
+            // Initialize items array
+            let items = [];
+            
+            // Add item button event listener
+            document.getElementById('addItem').addEventListener('click', function() {
+                const description = document.getElementById('itemDescription').value;
+                const sqft = parseFloat(document.getElementById('itemSqft').value);
+                const rate = parseFloat(document.getElementById('itemRate').value);
+                
+                if (!description || !sqft || !rate) {
+                    alert('Please fill all item fields');
+                    return;
+                }
+                
+                const amount = sqft * rate;
+                
+                // Add to items array
+                items.push({
+                    description,
+                    sqft,
+                    rate,
+                    amount
+                });
+                
+                // Update items table
+                updateItemsTable();
+                
+                // Update preview
+                updatePreview();
+                
+                // Clear input fields
+                document.getElementById('itemDescription').value = '';
+                document.getElementById('itemSqft').value = '';
+                document.getElementById('itemRate').value = '';
+            });
+            
+            // Update customer preview
+            const customerInputs = ['customerName', 'customerAddress', 'customerPhone', 'customerGST'];
+            customerInputs.forEach(inputId => {
+                document.getElementById(inputId).addEventListener('input', updatePreview);
+            });
+            
+            // Generate bill button
+            document.getElementById('generateBill').addEventListener('click', function() {
+                updatePreview();
+                alert('Bill generated successfully!');
+            });
+            
+            // Print bill button
+            document.getElementById('printBill').addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Reset form button
+            document.getElementById('resetForm').addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
+                    document.getElementById('customerName').value = '';
+                    document.getElementById('customerAddress').value = '';
+                    document.getElementById('customerPhone').value = '';
+                    document.getElementById('customerGST').value = '';
+                    
+                    items = [];
+                    updateItemsTable();
+                    updatePreview();
+                }
+            });
+            
+            // Function to update items table
+            function updateItemsTable() {
+                const tbody = document.querySelector('#itemsTable tbody');
+                tbody.innerHTML = '';
+                
+                items.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.description}</td>
+                        <td>${item.sqft.toFixed(2)}</td>
+                        <td>৳${item.rate.toFixed(2)}</td>
+                        <td>৳${item.amount.toFixed(2)}</td>
+                        <td class="actions">
+                            <button class="btn btn-danger" onclick="removeItem(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+            
+            // Function to update preview
+            function updatePreview() {
+                // Update customer info
+                document.getElementById('previewCustomerName').textContent = 
+                    document.getElementById('customerName').value || 'Customer Name';
+                document.getElementById('previewCustomerAddress').textContent = 
+                    document.getElementById('customerAddress').value || 'Address';
+                document.getElementById('previewCustomerPhone').textContent = 
+                    document.getElementById('customerPhone').value || 'Phone';
+                document.getElementById('previewCustomerGST').textContent = 
+                    document.getElementById('customerGST').value || 'GSTIN';
+                
+                // Update items in preview
+                const previewItems = document.getElementById('previewItems');
+                previewItems.innerHTML = '';
+                
+                let subtotal = 0;
+                
+                items.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.description}</td>
+                        <td>${item.sqft.toFixed(2)}</td>
+                        <td>৳${item.rate.toFixed(2)}</td>
+                        <td>৳${item.amount.toFixed(2)}</td>
+                    `;
+                    previewItems.appendChild(row);
+                    subtotal += item.amount;
+                });
+                
+                // Calculate GST and total
+                const gst = subtotal * 0.18;
+                const total = subtotal + gst;
+                
+                // Update amounts
+                document.getElementById('previewSubtotal').textContent = `৳${subtotal.toFixed(2)}`;
+                document.getElementById('previewGST').textContent = `৳${gst.toFixed(2)}`;
+                document.getElementById('previewTotal').textContent = `৳${total.toFixed(2)}`;
+            }
+            
+            // Function to remove item (needs to be global for onclick)
+            window.removeItem = function(index) {
+                items.splice(index, 1);
+                updateItemsTable();
+                updatePreview();
+            };
+        });
+    </script>
+</body>
+</html>
