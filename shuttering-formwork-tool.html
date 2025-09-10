@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shuttering/Formwork Tool — Calculator + Rent Bill Creator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{--primary:#2c3e50;--secondary:#3498db;--accent:#e74c3c;--success:#2ecc71;--calc-bg:#3f0062;--calc-text:#55d5ff;}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,Tahoma,sans-serif;}
+    body{background:linear-gradient(180deg,#560c8e,#2b0b3a);color:#fff;padding:20px;}
+    .container{max-width:1200px;margin:0 auto;}
+    header{background:linear-gradient(135deg,var(--primary),var(--secondary));padding:18px;border-radius:8px;color:#fff;}
+    header h1{font-size:1.25rem}
+    .app-grid{display:grid;grid-template-columns:1fr 520px;gap:20px;margin-top:20px;}
+    @media(max-width:1100px){.app-grid{grid-template-columns:1fr}}
+    .card{background:#fff;color:#222;padding:18px;border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,0.2)}
+    h3{margin-bottom:10px}
+    .form-group{margin-bottom:12px;}
+    label{font-weight:600;margin-bottom:4px;display:block}
+    input,select,textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;}
+    button{padding:8px 14px;border:none;border-radius:6px;cursor:pointer;font-weight:600}
+    .btn-primary{background:var(--secondary);color:#fff}
+    .btn-danger{background:var(--accent);color:#fff}
+    .btn-success{background:var(--success);color:#fff}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:0.9rem}
+    th,td{border:1px solid #ddd;padding:6px;text-align:left}
+    th{background:#f6f6f6}
+    .summary-row{display:flex;justify-content:space-between;margin-top:6px}
+    .summary-row.total{font-weight:700;font-size:1.05rem;border-top:2px solid var(--primary);margin-top:10px}
+    footer{text-align:center;margin-top:20px;font-size:0.85rem;color:#ddd}
+    /* Print styles for A4 */
+    @media print{
+      body{background:#fff;color:#000;padding:0}
+      header,.action-buttons,.no-print,footer{display:none}
+      .bill-preview{box-shadow:none;border:none;padding:0}
+      .app-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header class="container"><h1>Shuttering / Formwork Tool — Calculator + Rent Bill Creator</h1></header>
+
+  <main class="container app-grid">
+    <!-- LEFT: Inputs -->
+    <div>
+      <!-- Customer Info -->
+      <div class="card">
+        <h3><i class="fas fa-user"></i> Customer Info</h3>
+        <div class="form-group"><label>Name</label><input id="customerName" type="text"></div>
+        <div class="form-group"><label>Address</label><textarea id="customerAddress" rows="2"></textarea></div>
+        <div class="form-group"><label>Phone</label><input id="customerPhone" type="text"></div>
+        <div class="form-group"><label>GSTIN</label><input id="customerGST" type="text"></div>
+      </div>
+
+      <!-- Rental Items -->
+      <div class="card">
+        <h3><i class="fas fa-cube"></i> Rental Items</h3>
+        <div class="form-group">
+          <label>Template</label>
+          <select id="itemTemplate">
+            <option value="">-- Choose template --</option>
+            <option value="Slab|25">Slab (৳25)</option>
+            <option value="Beam|30">Beam (৳30)</option>
+            <option value="Column|28">Column (৳28)</option>
+            <option value="Wall|22">Wall (৳22)</option>
+            <option value="Staircase|32">Staircase (৳32)</option>
+            <option value="Round Column|35">Round Column (৳35)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Description</label><input id="itemDescription" type="text"></div>
+        <div class="form-group"><label>Area (sqft)</label><input id="itemSqft" type="number"></div>
+        <div class="form-group"><label>Rate (৳/sqft)</label><input id="itemRate" type="number"></div>
+        <div class="form-group flex">
+          <button id="addItem" class="btn-primary">Add Item</button>
+          <button id="clearItems" class="btn-danger">Clear Items</button>
+        </div>
+        <div>
+          <h4>Items List</h4>
+          <table id="itemsTable"><thead><tr><th>Description</th><th>Area</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+        <div class="no-print" style="margin-top:10px;display:flex;gap:6px">
+          <button onclick="exportCSV()" class="btn-success">Export CSV</button>
+          <button onclick="exportExcel()" class="btn-success">Export Excel</button>
+          <!-- Inside Rental Items card (below export buttons) -->
+<div class="no-print" style="margin-top:10px;">
+  <label><input type="checkbox" id="gstEnabled" checked> Apply GST</label>
+  <input type="number" id="gstRate" value="18" min="0" style="width:70px;margin-left:10px"> %
+</div>
+        </div>
+      </div>
+
+      <!-- Calculator -->
+      <div class="card">
+        <h3><i class="fas fa-calculator"></i> Calculator</h3>
+        <div class="form-group"><label>Structure Type</label>
+          <select id="structureType" onchange="showStructureInputs()">
+            <option value="wall">Wall</option><option value="beam">Beam</option>
+            <option value="column">Column</option><option value="roundColumn">Round Column</option>
+            <option value="slab">Slab</option><option value="stair">Staircase</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Wastage %</label><input id="wastage" type="number" value="5"></div>
+        <div class="form-group"><label>Plywood Size (e.g. 4x8)</label><input id="plywoodSize" value="4x8"></div>
+        <div class="form-group"><label>Rate (৳/sqft)</label><input id="materialRate" type="number"></div>
+        <div id="structureInputs"></div>
+        <div class="no-print" style="margin-top:10px;display:flex;gap:6px">
+          <button onclick="calculateFormwork()" class="btn-primary">Calculate</button>
+          <button onclick="copyCalcToItems()" class="btn-success">Add Result to Items</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Invoice Preview -->
+    <aside>
+      <div class="bill-preview card">
+        <h2 style="text-align:center">Invoice</h2>
+        <div>Date: <span id="invoiceDate"></span> | No: <span id="invoiceNumber"></span></div>
+        <hr>
+        <h4>From: J/s Enterprise</h4>
+        <p>Narayanganj, Bangladesh | Phone: 01994316210</p><hr>
+        <h4>Bill To:</h4>
+        <p id="previewCustomerName">Name</p>
+        <p id="previewCustomerAddress">Address</p>
+        <p id="previewCustomerPhone">Phone</p>
+        <p id="previewCustomerGST">GSTIN</p>
+        <hr>
+        <table>
+          <thead><tr><th>Description</th><th>Area</th><th>Rate</th><th>Amount</th></tr></thead>
+          <tbody id="previewItems"></tbody>
+        </table>
+        <div class="summary-row"><span>Subtotal</span><span id="previewSubtotal">৳0</span></div>
+        <div class="summary-row"><span>GST 18%</span><span id="previewGST">৳0</span></div>
+        <div class="summary-row total"><span>Total</span><span id="previewTotal">৳0</span></div>
+        <div class="no-print action-buttons" style="margin-top:10px;display:flex;gap:6px">
+          <button onclick="window.print()" class="btn-primary">Print</button>
+          <button onclick="downloadInvoice()" class="btn-success">Download</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>© 2025 Powered by Sabuj</footer>
+
+  <!-- Excel export library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    // ======= State =======
+    let items=[]; let lastCalc=null;
+    const invoiceDate=document.getElementById("invoiceDate");
+    const invoiceNumber=document.getElementById("invoiceNumber");
+    invoiceDate.textContent=new Date().toLocaleDateString();
+    invoiceNumber.textContent="INV-"+new Date().getFullYear()+"-"+Math.floor(Math.random()*999);
+    
+    // ======= Items (modified renderItems) =======
+function renderItems(){
+  const tbody=document.querySelector("#itemsTable tbody"); tbody.innerHTML="";
+  const pbody=document.getElementById("previewItems"); pbody.innerHTML="";
+  let sub=0;
+  items.forEach((it,i)=>{
+    tbody.innerHTML+=`<tr><td>${it.d}</td><td>${it.a.toFixed(2)}</td><td>৳${it.r}</td><td>৳${it.amt.toFixed(2)}</td><td><button onclick="delItem(${i})">x</button></td></tr>`;
+    pbody.innerHTML+=`<tr><td>${it.d}</td><td>${it.a.toFixed(2)}</td><td>৳${it.r}</td><td>৳${it.amt.toFixed(2)}</td></tr>`;
+    sub+=it.amt;
+  });
+
+  const gstEnabled=document.getElementById("gstEnabled").checked;
+  const gstRate=parseFloat(document.getElementById("gstRate").value)||0;
+  const gst=gstEnabled ? sub*(gstRate/100) : 0;
+  const total=sub+gst;
+
+  previewSubtotal.textContent="৳"+sub.toFixed(2);
+  document.getElementById("previewGST").textContent=(gstEnabled?`৳${gst.toFixed(2)} (${gstRate}%)`:"৳0.00 (N/A)");
+  previewTotal.textContent="৳"+total.toFixed(2);
+
+  ["customerName","customerAddress","customerPhone","customerGST"].forEach(id=>{
+    document.getElementById("preview"+id.charAt(0).toUpperCase()+id.slice(1)).textContent=document.getElementById(id).value;
+  });
+}
+
+// Re-render when GST controls change
+document.getElementById("gstEnabled").addEventListener("change",renderItems);
+document.getElementById("gstRate").addEventListener("input",renderItems);
+
+    // ======= Items =======
+    document.getElementById("itemTemplate").addEventListener("change",e=>{
+      if(!e.target.value) return;
+      const [desc,rate]=e.target.value.split("|");
+      document.getElementById("itemDescription").value=desc;
+      document.getElementById("itemRate").value=rate;
+    });
+    document.getElementById("addItem").onclick=function(){
+      const d=document.getElementById("itemDescription").value;
+      const a=parseFloat(document.getElementById("itemSqft").value);
+      const r=parseFloat(document.getElementById("itemRate").value);
+      if(!d||!a||!r) return alert("Fill all fields");
+      const amt=a*r; items.push({d,a,r,amt});
+      renderItems(); clearItemFields();
+    }
+    function clearItemFields(){["itemDescription","itemSqft","itemRate"].forEach(id=>document.getElementById(id).value="")}
+    document.getElementById("clearItems").onclick=()=>{if(confirm("Clear items?")){items=[];renderItems();}}
+    function renderItems(){
+      const tbody=document.querySelector("#itemsTable tbody"); tbody.innerHTML="";
+      const pbody=document.getElementById("previewItems"); pbody.innerHTML="";
+      let sub=0;
+      items.forEach((it,i)=>{
+        tbody.innerHTML+=`<tr><td>${it.d}</td><td>${it.a.toFixed(2)}</td><td>৳${it.r}</td><td>৳${it.amt.toFixed(2)}</td><td><button onclick="delItem(${i})">x</button></td></tr>`;
+        pbody.innerHTML+=`<tr><td>${it.d}</td><td>${it.a.toFixed(2)}</td><td>৳${it.r}</td><td>৳${it.amt.toFixed(2)}</td></tr>`;
+        sub+=it.amt;
+      });
+      const gst=sub*0.18,total=sub+gst;
+      previewSubtotal.textContent="৳"+sub.toFixed(2);
+      previewGST.textContent="৳"+gst.toFixed(2);
+      previewTotal.textContent="৳"+total.toFixed(2);
+      ["customerName","customerAddress","customerPhone","customerGST"].forEach(id=>{
+        document.getElementById("preview"+id.charAt(0).toUpperCase()+id.slice(1)).textContent=document.getElementById(id).value;
+      });
+    }
+    window.delItem=i=>{items.splice(i,1);renderItems()}
+
+    // ======= Export =======
+    function exportCSV(){
+      let csv="Description,Area,Rate,Amount\n"+items.map(it=>`${it.d},${it.a},${it.r},${it.amt}`).join("\n");
+      downloadFile(csv,"items.csv","text/csv");
+    }
+    function exportExcel(){
+      const ws=XLSX.utils.json_to_sheet(items.map(it=>({Description:it.d,Area:it.a,Rate:it.r,Amount:it.amt})));
+      const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Items");
+      XLSX.writeFile(wb,"items.xlsx");
+    }
+    function downloadFile(content,filename,type){
+      const blob=new Blob([content],{type}); const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+    }
+
+    // ======= Calculator =======
+    function showStructureInputs(){
+      const t=document.getElementById("structureType").value;
+      let html="";
+      if(t=="wall") html='<label>Length (ft)</label><input id="L"><label>Height (ft)</label><input id="H">';
+      if(t=="slab") html='<label>Length (ft)</label><input id="L"><label>Width (ft)</label><input id="W">';
+      if(t=="beam") html='<label>Length</label><input id="L"><label>Width</label><input id="W"><label>Height</label><input id="H">';
+      if(t=="column") html='<label>Length</label><input id="L"><label>Width</label><input id="W"><label>Height</label><input id="H">';
+      if(t=="roundColumn") html='<label>Diameter</label><input id="D"><label>Height</label><input id="H">';
+      if(t=="stair") html='<label>Rise</label><input id="R"><label>Tread</label><input id="T"><label>Steps</label><input id="S"><label>Width</label><input id="W">';
+      if(t=="custom") html='<label>Total Area</label><input id="A">';
+      document.getElementById("structureInputs").innerHTML=html;
+    }showStructureInputs();
+    function calculateFormwork(){
+      const t=document.getElementById("structureType").value;
+      const wst=parseFloat(document.getElementById("wastage").value)||0;
+      const [pw,ph]=document.getElementById("plywoodSize").value.split("x").map(Number);
+      let A=0;
+      if(t=="wall"){A=document.getElementById("L").value*document.getElementById("H").value*2}
+      if(t=="slab"){A=document.getElementById("L").value*document.getElementById("W").value}
+      if(t=="beam"){A=(2*document.getElementById("H").value+parseFloat(document.getElementById("W").value))*document.getElementById("L").value}
+      if(t=="column"){A=2*(parseFloat(document.getElementById("L").value)+parseFloat(document.getElementById("W").value))*document.getElementById("H").value}
+      if(t=="roundColumn"){A=Math.PI*document.getElementById("D").value*document.getElementById("H").value}
+      if(t=="stair"){A=(document.getElementById("R").value*document.getElementById("S").value*document.getElementById("W").value)+(document.getElementById("T").value*document.getElementById("S").value*document.getElementById("W").value)}
+      if(t=="custom"){A=document.getElementById("A").value}
+      const total=A*(1+wst/100); const sheets=Math.ceil(total/(pw*ph));
+      lastCalc={t,total,sheets}; alert("Formwork="+total.toFixed(2)+" sqft, Sheets="+sheets);
+    }
+    function copyCalcToItems(){
+      if(!lastCalc) return alert("No calc yet");
+      const r=parseFloat(prompt("Enter rate:",25))||0; const amt=lastCalc.total*r;
+      items.push({d:"Formwork "+lastCalc.t,a:lastCalc.total,r,amt});renderItems();
+    }
+
+    // ======= Download Invoice =======
+    function downloadInvoice(){
+      const html=document.querySelector(".bill-preview").outerHTML;
+      downloadFile("<html><body>"+html+"</body></html>","invoice.html","text/html");
+    }
+
+    // Auto update preview when typing customer info
+    ["customerName","customerAddress","customerPhone","customerGST"].forEach(id=>{
+      document.getElementById(id).addEventListener("input",renderItems);
+    });
+  </script>
+</body>
+</html>
