@@ -694,7 +694,7 @@
           discount = parseFloat($("itemDiscount").value)||0,
           note = $("itemNote").value;
       if (!desc || area <= 0 || rate <= 0) return alert("Fill all item fields");
-      let amount = area * rate * (1 - discount/100);
+      let amount = area * rate * (0 - discount/100);
       items.push({ cat, desc, area, rate, discount, note, amount });
       $("itemDescription").value = $("itemSqft").value = $("itemRate").value = $("itemDiscount").value = $("itemNote").value = "";
       updateAll();
