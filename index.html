@@ -44,6 +44,44 @@
       z-index: 1;
     }
 
+    /* Responsive Header Logo */
+    .header-logo {
+      display: block;
+      margin: 0 auto 30px auto;
+      width: 180px;
+      max-width: 60vw;
+      height: auto;
+      z-index: 1;
+      position: relative;
+      transition: width 0.3s, max-width 0.3s;
+    }
+
+    @media (max-width: 800px) {
+      .header-logo {
+        width: 120px;
+        max-width: 40vw;
+      }
+      header {
+        padding: 70px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-logo {
+        width: 80px;
+        max-width: 70vw;
+      }
+      header {
+        padding: 35px 5px;
+      }
+      header h1 {
+        font-size: 2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+    }
+
     header h1 {
       font-size: 3rem;
       margin-bottom: 10px;
@@ -232,7 +270,7 @@
 
 <body>
   <header>
-      <img src="https://raw.githubusercontent.com/sabujdotnet/sabujdotnet.github.io/refs/heads/main/img/file_00000000e354620ab6ca43b7cf7a45c0.png" alt="">
+    <img class="header-logo" src="/img/file_00000000e354620ab6ca43b7cf7a45c0.png" alt="J/s Enterprise Logo">
     <h1>J/s Enterprise</h1>
     <p>Building Construction & Shuttering/Formwork Provider</p>
   </header>
