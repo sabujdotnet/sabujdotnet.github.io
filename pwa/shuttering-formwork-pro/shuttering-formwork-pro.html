@@ -233,6 +233,12 @@
   </main>
   <footer style="text-align:center; color:#ddd; margin-bottom:10px;">© 2025 Powered by Sabuj</footer>
   <!-- PWA Install Banner etc. can go here -->
+  <script>
+  if (typeof navigator.serviceWorker !== 'undefined') {
+    navigator.serviceWorker.register('sw.js')
+  }
+  </script>
+  
   <!-- Language, Auth, Analytics, IndexedDB, Email, PDF, QRCode scripts... -->
   <script>
     // ==== STATE ====
