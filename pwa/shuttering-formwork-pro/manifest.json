@@ -1,0 +1,37 @@
+{
+  "name": "Shuttering/Formwork Pro",
+  "short_name": "FormworkPro",
+  "description": "All-in-one Invoice &amp; Rental Management Tool for Shuttering/Formwork businesses.",
+  "start_url": "shuttering-formwork-pro.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#2c3e50",
+  "theme_color": "#3498db",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "lang": "en",
+  "dir": "auto",
+  "display_override": [
+    "fullscreen",
+    "minimal-ui",
+    "standalone",
+    "window-controls-overlay",
+    "browser"
+  ],
+  "prefer_related_applications": false,
+  "categories": [
+    "business",
+    "utilities"
+  ]
+}
