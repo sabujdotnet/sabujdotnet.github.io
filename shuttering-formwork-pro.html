@@ -44,11 +44,28 @@
     .logo-preview { max-width: 110px; max-height: 70px; margin-bottom: 5px;}
     .qr { margin-top: 10px;}
     .no-print { display: block;}
+    /* Watermark styling for invoice */
+    .invoice-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 380px;
+      max-width: 60vw;
+      opacity: 0.08;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .bill-preview {
+      position: relative;
+      overflow: hidden;
+    }
     @media print {
       body { background: #fff; color: #000; }
       .no-print, header, footer { display: none !important; }
       .app-grid { grid-template-columns: 1fr; }
       .bill-preview { box-shadow: none; border: none; }
+      .invoice-watermark { opacity: 0.10 !important; }
     }
   </style>
 </head>
@@ -57,7 +74,7 @@
     <div class="container flex">
       <div class="flex">
         <i class="fas fa-hard-hat" style="font-size:2.2em"></i>
-        <img class="header-logo" src="/img/logo" />
+        <img class="header-logo" src="/img/logo.png" />
         <div>
           <h2 id="appTitle">Shuttering/Formwork Pro</h2>
           <small id="appDesc">All-in-one Invoice & Rental Management Tool</small>
@@ -188,6 +205,8 @@
     <!-- RIGHT: Invoice Preview -->
     <aside>
       <div class="bill-preview card" id="billPreview">
+        <!-- Watermark image -->
+        <img src="/img/logo.png" alt="watermark" class="invoice-watermark" id="invoiceWatermark" />
         <div class="flex-row" style="align-items:center;justify-content:space-between;">
           <div>
             <img id="previewLogo" class="logo-preview" style="display:inline;">
@@ -233,8 +252,6 @@
     </aside>
   </main>
   <footer style="text-align:center; color:#ddd; margin-bottom:10px;">© 2025 Powered by Sabuj</footer>
-  <!-- PWA Install Banner etc. can go here -->
-  <!-- Language, Auth, Analytics, IndexedDB, Email, PDF, QRCode scripts... -->
   <script>
     // ==== STATE ====
     let items = [];
@@ -394,6 +411,7 @@
         alert("Bill preview area not found!");
         return;
       }
+      // Hide watermark for PDF if you don't want it, or keep as is for visible watermark
       html2pdf().set({ filename: $("invoiceNumber").textContent + ".pdf" })
         .from(el).save();
     }
