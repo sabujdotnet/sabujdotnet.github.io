@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shuttering/Formwork Pro — Invoice & Rental Tool</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --primary: #2c3e50; --secondary: #3498db; --accent: #e74c3c;
+      --success: #2ecc71; --bg: #f5f6fa; --card: #fff;
+      --dark-bg: #2b0b3a; --dark-card: #3a1a4a;
+    }
+    
+    * { box-sizing: border-box; }
+    
+    body { 
+      background: linear-gradient(180deg, #560c8e, #2b0b3a); 
+      color: #222; 
+      padding: 0; 
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+    }
+    
+    .container { 
+      max-width: 1280px; 
+      margin: 0 auto; 
+      padding: 20px;
+    }
+    
+    header { 
+      background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+      color: #fff; 
+      padding: 15px 20px; 
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+    }
+    
+    .flex { 
+      display: flex; 
+      gap: 16px; 
+      align-items: center;
+    }
+    
+    .right { 
+      margin-left: auto;
+    }
+    
+    .lang-switch { 
+      border: none; 
+      background: rgba(255,255,255,0.2); 
+      color: #fff; 
+      font-size: 0.9em; 
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+    
+    .lang-switch:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .app-grid { 
+      display: grid; 
+      grid-template-columns: 1fr 480px; 
+      gap: 28px; 
+      margin-top: 24px;
+    }
+    
+    @media (max-width: 1100px) { 
+      .app-grid { 
+        grid-template-columns: 1fr; 
+      } 
+    }
+    
+    .card { 
+      background: var(--card); 
+      border-radius: 10px; 
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1); 
+      padding: 20px; 
+      margin-bottom: 18px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    }
+    
+    h2, h3 { 
+      margin: 0 0 10px 0;
+      color: var(--primary);
+    }
+    
+    .form-group { 
+      margin-bottom: 14px; 
+    }
+    
+    label { 
+      font-weight: 600; 
+      margin-bottom: 4px; 
+      display: block;
+      color: #444;
+    }
+    
+    input, select, textarea { 
+      width: 100%; 
+      padding: 10px; 
+      border: 1px solid #ddd; 
+      border-radius: 6px; 
+      font-size: 1em;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    .flex-row { 
+      display: flex; 
+      gap: 10px; 
+      align-items: center;
+    }
+    
+    .ftin-row { 
+      display: flex; 
+      gap: 6px; 
+      align-items: center; 
+      flex-wrap: wrap;
+    }
+    
+    .ftin-row input[type=number] { 
+      width: 60px; 
+    }
+    
+    button { 
+      padding: 10px 18px; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary { 
+      background: var(--secondary); 
+      color: #fff;
+    }
+    
+    .btn-primary:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+    }
+    
+    .btn-danger { 
+      background: var(--accent); 
+      color: #fff;
+    }
+    
+    .btn-danger:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+    }
+    
+    .btn-success { 
+      background: var(--success); 
+      color: #fff;
+    }
+    
+    .btn-success:hover {
+      background: #27ae60;
+      transform: translateY(-2px);
+    }
+    
+    .btn-gray { 
+      background: #eee;
+    }
+    
+    .btn-gray:hover {
+      background: #ddd;
+      transform: translateY(-2px);
+    }
+    
+    .btn:disabled { 
+      opacity: .6; 
+      cursor: not-allowed;
+    }
+    
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 10px; 
+      font-size: 0.95em;
+    }
+    
+    th, td { 
+      border: 1px solid #ddd; 
+      padding: 8px; 
+      text-align: left;
+    }
+    
+    th { 
+      background: #f2f8fa;
+      font-weight: 600;
+    }
+    
+    .summary-row { 
+      display: flex; 
+      justify-content: space-between; 
+      margin-top: 8px;
+      padding: 5px 0;
+    }
+    
+    .summary-row.total { 
+      font-weight: bold; 
+      border-top: 2px solid var(--primary);
+      font-size: 1.1em;
+    }
+    
+    .logo-preview { 
+      max-width: 110px; 
+      max-height: 70px; 
+      margin-bottom: 5px;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 5px;
+    }
+    
+    .qr { 
+      margin-top: 10px;
+    }
+    
+    .no-print { 
+      display: block;
+    }
+    
+    /* Logo imprint styling for invoice */ 
+    .invoice-imprint { 
+     position: absolute;
+     top: 50%; 
+     left: 50%;
+     width: 380px; 
+     max-width: 60vW; 
+     opacity: 0.08; 
+     transform: translate(-50%,-50%): 
+     z-index: 0; 
+     pointer-events: none; 
+   }
+    
+    /* Watermark styling for invoice */
+    .invoice-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 380px;
+      max-width: 60vw;
+      opacity: 0.08;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      pointer-events: none;
+      font-size: 32px;
+      font-weight: bold;
+      text-align: center;
+      color: #2c3e50;
+      line-height: 1.2;
+      white-space: pre-line;
+      font-family: 'Arial', sans-serif;
+    }
+    
+    .bill-preview {
+      position: relative;
+      overflow: hidden;
+      background: white;
+      min-height: 600px;
+    }
+    
+    .header-logo {
+      height: 50px;
+      margin-right: 10px;
+    }
+    
+    .dashboard-item {
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .dashboard-item:hover {
+      background: #f0f0f0;
+      transform: translateX(5px);
+    }
+    
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .project-name {
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .project-meta {
+      font-size: 0.9em;
+      color: #666;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    
+    .status-paid {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-draft {
+      background: #e2e3e5;
+      color: #383d41;
+    }
+    
+    .tab-container {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 15px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      border-bottom: 3px solid var(--secondary);
+      font-weight: bold;
+      color: var(--secondary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #eee;
+    }
+    
+    .company-info {
+      flex: 1;
+    }
+    
+    .invoice-meta {
+      text-align: right;
+    }
+    
+    .customer-info {
+      margin: 15px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+    
+    .invoice-table {
+      width: 100%;
+      margin: 20px 0;
+    }
+    
+    .invoice-table th {
+      background: #2c3e50;
+      color: white;
+    }
+    
+    .invoice-summary {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 2px solid #eee;
+    }
+    
+    .invoice-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .project-selector {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+    
+    .project-invoices {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .project-summary {
+      margin-top: 15px;
+      padding: 10px;
+      background: #e9ecef;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    
+    @media print {
+      body { 
+        background: #fff; 
+        color: #000; 
+      }
+      .no-print, header, footer { 
+        display: none !important; 
+      }
+      .app-grid { 
+        grid-template-columns: 1fr; 
+      }
+      .bill-preview { 
+        box-shadow: none; 
+        border: none; 
+        min-height: auto;
+      }
+      .invoice-watermark { 
+        opacity: 0.10 !important; 
+      }
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .card {
+        background: var(--dark-card);
+        color: #eee;
+      }
+      
+      input, select, textarea {
+        background: #444;
+        color: #eee;
+        border-color: #555;
+      }
+      
+      th {
+        background: #555;
+        color: #eee;
+      }
+    }
+    
+    footer {
+      text-align: center; 
+      color: #ddd; 
+      margin-top: 30px;
+      padding: 20px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container flex">
+      <div class="flex">
+        <i class="fas fa-hard-hat" style="font-size:2.2em"></i>
+        <div>
+          <h2 id="appTitle">Shuttering/Formwork Pro</h2>
+          <small id="appDesc">All-in-one Invoice & Rental Management Tool</small>
+        </div>
+      </div>
+      <div class="flex">
+        <button type="button" class="lang-switch" onclick="setLang('en')">EN</button>
+        <button type="button" class="lang-switch" onclick="setLang('bn')">BN</button>
+        <button type="button" class="lang-switch" onclick="setLang('hi')">HI</button>
+        <button type="button" class="btn-primary" onclick="showLogin()" id="loginBtn">Login</button>
+        <button type="button" class="btn-danger" onclick="logout()" id="logoutBtn" style="display:none;">Logout</button>
+      </div>
+    </div>
+  </header>
+  
+  <main class="container app-grid">
+    <div>
+      <!-- Tab Navigation -->
+      <div class="tab-container">
+        <div class="tab active" onclick="switchTab('invoice')">Invoice</div>
+        <div class="tab" onclick="switchTab('projects')">Projects</div>
+        <div class="tab" onclick="switchTab('dashboard')">Dashboard</div>
+        <div class="tab" onclick="switchTab('settings')">Settings</div>
+      </div>
+      
+      <!-- Invoice Tab -->
+      <div id="invoice-tab" class="tab-content active">
+        <!-- Project Selection -->
+        <div class="card">
+          <h3><i class="fas fa-folder"></i> Project Selection</h3>
+          <div class="form-group flex-row">
+            <label>Select Project:</label>
+            <select id="projectSelect" onchange="loadProject(this.value)" style="flex: 1;">
+              <option value="">-- Create New Project --</option>
+            </select>
+            <button type="button" class="btn-primary" onclick="showNewProjectModal()">New Project</button>
+          </div>
+          <div class="form-group">
+            <label>Project Name</label>
+            <input id="projectName" type="text" placeholder="Enter project name">
+          </div>
+          <div class="form-group">
+            <label>Project Description</label>
+            <textarea id="projectDescription" rows="2" placeholder="Project details"></textarea>
+          </div>
+        </div>
+        
+        <!-- Company Info & Logo -->
+        <div class="card">
+          <h3><i class="fas fa-building"></i> Business Settings</h3>
+          <div class="form-group">
+            <label>Company Name</label>
+            <input id="companyName" value="J/s Enterprise">
+          </div>
+          <div class="form-group">
+            <label>Company Address</label>
+            <input id="companyAddress" value="Narayanganj, Bangladesh">
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input id="companyPhone" value="01994316210">
+          </div>
+          <div class="form-group">
+            <label>GSTIN</label>
+            <input id="companyGST" value="27ABCDE1234F1Z2">
+          </div>
+          <div class="form-group">
+            <label>Logo</label>
+            <input type="file" id="logoUpload" accept="image/*">
+            <img id="logoPreview" class="logo-preview" />
+          </div>
+          <div class="form-group flex-row">
+            <label>Currency</label>
+            <select id="currency">
+              <option value="৳">৳ BDT</option>
+              <option value="₹">₹ INR</option>
+              <option value="$">$ USD</option>
+              <option value="€">€ EUR</option>
+            </select>
+            <label class="right">Tax Rate (%)</label>
+            <input id="taxRate" type="number" value="18" min="0" style="width:70px;">
+          </div>
+        </div>
+        
+        <!-- Customer Info -->
+        <div class="card">
+          <h3><i class="fas fa-user"></i> Customer Info</h3>
+          <div class="form-group"><label>Name</label><input id="customerName" type="text"></div>
+          <div class="form-group"><label>Address</label><textarea id="customerAddress" rows="2"></textarea></div>
+          <div class="form-group"><label>Phone</label><input id="customerPhone" type="text"></div>
+          <div class="form-group"><label>GSTIN</label><input id="customerGST" type="text"></div>
+        </div>
+        
+        <!-- Rental Items -->
+        <div class="card">
+          <h3><i class="fas fa-cube"></i> Rental Items</h3>
+          <div class="form-group flex-row">
+            <label>Category</label>
+            <select id="itemCategory">
+              <option value="Slab">Slab</option>
+              <option value="Beam">Beam</option>
+              <option value="Column">Column</option>
+              <option value="Wall">Wall</option>
+              <option value="Staircase">Staircase</option>
+              <option value="Round Column">Round Column</option>
+              <option value="Other">Other</option>
+            </select>
+            <label>Available</label>
+            <input id="itemInventory" type="number" min="0" value="100" style="width:70px;">
+          </div>
+          <div class="form-group"><label>Description</label><input id="itemDescription" type="text"></div>
+          <div class="form-group flex-row">
+            <label>Area (sqft)</label>
+            <input id="itemSqft" type="number" step="any" placeholder="Area" style="flex:1;">
+          </div>
+          <div class="form-group flex-row">
+            <label>OR, Enter (ft x inch):</label>
+            <div class="ftin-row">
+              <input id="itemFt" type="number" min="0" placeholder="ft">
+              <span>ft</span>
+              <input id="itemIn" type="number" min="0" max="11.99" step="any" placeholder="in">
+              <span>in</span>
+              <span>×</span>
+              <input id="itemFt2" type="number" min="0" placeholder="ft">
+              <span>ft</span>
+              <input id="itemIn2" type="number" min="0" max="11.99" step="any" placeholder="in">
+              <span>in</span>
+              <button type="button" class="btn-gray" onclick="calcSqftFromFtIn()">=</button>
+              <span id="ftinResult" style="min-width:70px;display:inline-block;"></span>
+            </div>
+          </div>
+          <div class="form-group flex-row">
+            <label>Rate</label><input id="itemRate" type="number">
+          </div>
+          <div class="form-group flex-row">
+            <label>Discount</label><input id="itemDiscount" type="number" min="0" value="0" style="width:60px;">%
+            <label>Notes</label><input id="itemNote" type="text">
+          </div>
+          <div class="form-group flex-row">
+            <button type="button" id="addItem" class="btn-primary">Add Item</button>
+            <button type="button" id="clearItems" class="btn-danger">Clear Items</button>
+          </div>
+          <h4>Items List</h4>
+          <table id="itemsTable"><thead><tr>
+            <th>Category</th><th>Description</th><th>Area</th><th>Rate</th><th>Discount</th><th>Amount</th><th>Note</th><th></th></tr></thead><tbody></tbody></table>
+        </div>
+        
+        <!-- Invoice Notes, Charges, Discount -->
+        <div class="card">
+          <h3><i class="fas fa-file-alt"></i> Invoice Details</h3>
+          <div class="form-group"><label>Additional Charges</label><input id="addCharges" type="number" value="0"></div>
+          <div class="form-group"><label>Total Discount (%)</label><input id="totalDiscount" type="number" value="0"></div>
+          <div class="form-group"><label>Notes</label><textarea id="invoiceNote"></textarea></div>
+          <div class="form-group flex-row">
+            <button type="button" onclick="saveInvoice()" class="btn-success">Save Invoice</button>
+            <button type="button" onclick="saveProject()" class="btn-primary">Save Project</button>
+            <button type="button" onclick="resetForm()" class="btn-danger">Reset Form</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Projects Tab -->
+      <div id="projects-tab" class="tab-content">
+        <div class="card">
+          <h3><i class="fas fa-folder-open"></i> Project Management</h3>
+          <div class="flex-row">
+            <button type="button" onclick="showNewProjectModal()" class="btn-primary">New Project</button>
+            <button type="button" onclick="refreshProjects()" class="btn-gray">Refresh</button>
+          </div>
+          <div id="projectsList" class="project-invoices" style="margin-top:10px"></div>
+        </div>
+      </div>
+      
+      <!-- Dashboard Tab -->
+      <div id="dashboard-tab" class="tab-content">
+        <div class="card">
+          <h3><i class="fas fa-database"></i> Data & Dashboard</h3>
+          <div class="flex-row">
+            <button type="button" onclick="showDashboard()" class="btn-success">Refresh</button>
+            <button type="button" onclick="exportCSV()" class="btn-gray">Export CSV</button>
+            <button type="button" onclick="exportExcel()" class="btn-gray">Export Excel</button>
+          </div>
+          <div id="analyticsBoard" style="margin-top:10px"></div>
+        </div>
+      </div>
+      
+      <!-- Settings Tab -->
+      <div id="settings-tab" class="tab-content">
+        <div class="card">
+          <h3><i class="fas fa-cog"></i> Application Settings</h3>
+          <div class="form-group">
+            <label>Default Tax Rate (%)</label>
+            <input id="defaultTaxRate" type="number" value="18" min="0">
+          </div>
+          <div class="form-group">
+            <label>Default Currency</label>
+            <select id="defaultCurrency">
+              <option value="৳">৳ BDT</option>
+              <option value="₹">₹ INR (in paid version)</option>
+              <option value="$">$ USD(in paid version)</option>
+              <option value="€">€ EU(in paid version )R</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Invoice Number Format</label>
+            <input id="invoiceFormat" value="INV-YYYY-#####">
+          </div>
+          <button type="button" class="btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- RIGHT: Invoice Preview -->
+    <aside>
+      <div class="bill-preview card" id="billPreview">
+        <!-- Logo imprint -->
+        <img src="https://github.com/sabujdotnet/sabujdotnet.github.io/blob/main/img/logo.png?raw=true" alt="J/s Enterprise Logo" class="invoice-imprint" id="invoiceImprint" />
+        
+        <div class="invoice-header">
+          <div class="company-info">
+            <img id="previewLogo" class="logo-preview" style="display:inline;">
+            <h2 style="margin:8px 0 0 0" id="previewCompanyName"></h2>
+            <small id="previewCompanyAddress"></small>
+            <div id="previewCompanyPhone"></div>
+            <div id="previewCompanyGST"></div>
+          </div>
+          <div class="invoice-meta">
+            <div class="qr" id="qrCode"></div>
+            <div style="margin:10px 0;">
+              <b>Invoice #: </b><span id="invoiceNumber"></span><br>
+              <b>Date: </b><span id="invoiceDate"></span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="customer-info">
+          <b>Bill To:</b>
+          <div id="previewCustomerName"></div>
+          <div id="previewCustomerAddress"></div>
+          <div id="previewCustomerPhone"></div>
+          <div id="previewCustomerGST"></div>
+        </div>
+        
+        <table class="invoice-table">
+          <thead><tr>
+            <th>Category</th><th>Description</th><th>Area</th><th>Rate</th><th>Disc.</th><th>Amount</th><th>Note</th>
+          </tr></thead>
+          <tbody id="previewItems"></tbody>
+        </table>
+        
+        <div class="invoice-summary">
+          <div class="summary-row"><span>Subtotal</span><span id="previewSubtotal"></span></div>
+          <div class="summary-row"><span>Additional Charges</span><span id="previewAddCharges"></span></div>
+          <div class="summary-row"><span>Discount</span><span id="previewDiscount"></span></div>
+          <div class="summary-row"><span>Tax</span><span id="previewTax"></span></div>
+          <div class="summary-row total"><span>Total</span><span id="previewTotal"></span></div>
+        </div>
+        
+        <div><b>Notes:</b> <span id="previewInvoiceNote"></span></div>
+        <div style="margin-top: 10px; text-align:center; color:#555">Thank you for your business!</div>
+        
+        <div class="no-print invoice-actions">
+          <button type="button" onclick="printInvoice()" class="btn-primary">Print</button>
+          <button type="button" onclick="downloadPDF()" class="btn-success">PDF</button>
+          <button type="button" onclick="sendEmail()" class="btn-gray">Send Email</button>
+          <button type="button" onclick="resetForm()" class="btn-danger">Reset</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+  
+  <footer>
+    © 2025 Powered by Sabuj | Shuttering Pro
+  </footer>
+
+  <script>
+    // ==== STATE ====
+    let items = [];
+    let projects = JSON.parse(localStorage.getItem("projects") || "[]");
+    let currentProjectId = null;
+    let invoices = JSON.parse(localStorage.getItem("invoices") || "[]");
+    let logoData = localStorage.getItem("companyLogo") || "";
+    let user = null;
+    let settings = JSON.parse(localStorage.getItem("appSettings") || '{"taxRate":18,"currency":"৳","invoiceFormat":"INV-YYYY-#####"}');
+
+    // ==== UTILS ====
+    function $(id) { return document.getElementById(id); }
+    function currency() { return $("currency").value; }
+    function taxRate() { return parseFloat($("taxRate").value) || 0; }
+    function previewCurrency(val) { return currency() + (parseFloat(val)||0).toFixed(2); }
+    function genInvoiceNum() { 
+      const format = settings.invoiceFormat || "INV-YYYY-#####";
+      const year = new Date().getFullYear();
+      const random = Math.floor(Math.random()*99999);
+      return format.replace("YYYY", year).replace("#####", random.toString().padStart(5, '0'));
+    }
+    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+
+    // ==== TAB MANAGEMENT ====
+    function switchTab(tabName) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show selected tab content
+      document.getElementById(tabName + '-tab').classList.add('active');
+      
+      // Activate selected tab
+      event.target.classList.add('active');
+      
+      // Refresh content if needed
+      if (tabName === 'projects') {
+        refreshProjects();
+      } else if (tabName === 'dashboard') {
+        showDashboard();
+      }
+    }
+
+    // ==== PROJECT MANAGEMENT ====
+    function showNewProjectModal() {
+      $("projectName").value = "";
+      $("projectDescription").value = "";
+      $("projectSelect").value = "";
+      currentProjectId = null;
+    }
+    
+    function saveProject() {
+      const projectName = $("projectName").value.trim();
+      if (!projectName) {
+        alert("Please enter a project name");
+        return;
+      }
+      
+      const project = {
+        id: currentProjectId || generateId(),
+        name: projectName,
+        description: $("projectDescription").value,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Check if updating existing project
+      const existingIndex = projects.findIndex(p => p.id === project.id);
+      if (existingIndex >= 0) {
+        projects[existingIndex] = project;
+      } else {
+        projects.push(project);
+      }
+      
+      localStorage.setItem("projects", JSON.stringify(projects));
+      updateProjectSelector();
+      $("projectSelect").value = project.id;
+      currentProjectId = project.id;
+      
+      alert("Project saved successfully!");
+    }
+    
+    function updateProjectSelector() {
+      const selector = $("projectSelect");
+      selector.innerHTML = '<option value="">-- Create New Project --</option>';
+      
+      projects.forEach(project => {
+        const option = document.createElement("option");
+        option.value = project.id;
+        option.textContent = project.name;
+        selector.appendChild(option);
+      });
+    }
+    
+    function loadProject(projectId) {
+      if (!projectId) {
+        showNewProjectModal();
+        return;
+      }
+      
+      const project = projects.find(p => p.id === projectId);
+      if (project) {
+        $("projectName").value = project.name;
+        $("projectDescription").value = project.description || "";
+        currentProjectId = project.id;
+      }
+    }
+    
+    function refreshProjects() {
+      const projectsList = $("projectsList");
+      if (!projectsList) return;
+      
+      if (projects.length === 0) {
+        projectsList.innerHTML = "<p>No projects found. Create your first project!</p>";
+        return;
+      }
+      
+      let html = "";
+      projects.forEach(project => {
+        const projectInvoices = invoices.filter(inv => inv.projectId === project.id);
+        const totalInvoices = projectInvoices.length;
+        const totalAmount = projectInvoices.reduce((sum, inv) => sum + parseFloat(inv.total.replace(/[^\d.]/g, '') || 0), 0);
+        
+        html += `
+          <div class="dashboard-item" onclick="loadProject('${project.id}'); switchTab('invoice')">
+            <div class="project-header">
+              <span class="project-name">${project.name}</span>
+              <span class="status-badge status-${totalInvoices > 0 ? 'paid' : 'draft'}">${totalInvoices} invoices</span>
+            </div>
+            <div class="project-meta">
+              ${project.description || "No description"}
+            </div>
+            <div class="project-meta">
+              Created: ${new Date(project.createdAt).toLocaleDateString()} | 
+              Total: ${currency()}${totalAmount.toFixed(2)}
+            </div>
+            <div class="project-invoices">
+              ${projectInvoices.map(inv => `
+                <div style="padding: 5px; margin: 2px 0; background: #f0f0f0; border-radius: 3px;">
+                  ${inv.number} - ${inv.total} - ${inv.date}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+      
+      projectsList.innerHTML = html;
+    }
+    
+    function deleteProject(projectId) {
+      if (!confirm("Are you sure you want to delete this project? All associated invoices will also be deleted.")) {
+        return;
+      }
+      
+      // Remove project
+      projects = projects.filter(p => p.id !== projectId);
+      
+      // Remove associated invoices
+      invoices = invoices.filter(inv => inv.projectId !== projectId);
+      
+      localStorage.setItem("projects", JSON.stringify(projects));
+      localStorage.setItem("invoices", JSON.stringify(invoices));
+      
+      if (currentProjectId === projectId) {
+        showNewProjectModal();
+      }
+      
+      updateProjectSelector();
+      refreshProjects();
+      alert("Project deleted successfully!");
+    }
+
+    // ==== INVOICE MANAGEMENT ====
+    function saveInvoice() {
+      if (!currentProjectId) {
+        alert("Please select or create a project first");
+        return;
+      }
+      
+      const invoice = {
+        id: generateId(),
+        projectId: currentProjectId,
+        number: $("invoiceNumber").textContent,
+        date: $("invoiceDate").textContent,
+        customer: {
+          name: $("customerName").value, 
+          address: $("customerAddress").value,
+          phone: $("customerPhone").value, 
+          gst: $("customerGST").value
+        },
+        company: {
+          name: $("companyName").value,
+          address: $("companyAddress").value,
+          phone: $("companyPhone").value,
+          gst: $("companyGST").value
+        },
+        items: JSON.parse(JSON.stringify(items)),
+        charges: $("addCharges").value, 
+        discount: $("totalDiscount").value,
+        note: $("invoiceNote").value, 
+        total: $("previewTotal").textContent,
+        status: 'draft',
+        createdAt: new Date().toISOString()
+      };
+      
+      // Check if updating existing invoice
+      const existingIndex = invoices.findIndex(inv => inv.number === invoice.number);
+      if (existingIndex >= 0) {
+        invoices[existingIndex] = invoice;
+      } else {
+        invoices.push(invoice);
+      }
+      
+      localStorage.setItem("invoices", JSON.stringify(invoices));
+      alert("Invoice saved to project!");
+    }
+
+    // ==== FT-INCH AREA CALC ====
+    function calcSqftFromFtIn() {
+      let ft1 = parseFloat($("itemFt").value)||0;
+      let in1 = parseFloat($("itemIn").value)||0;
+      let ft2 = parseFloat($("itemFt2").value)||0;
+      let in2 = parseFloat($("itemIn2").value)||0;
+      let dim1 = ft1 + in1/12;
+      let dim2 = ft2 + in2/12;
+      let area = dim1 * dim2;
+      $("ftinResult").textContent = area>0 ? area.toFixed(3)+" sqft" : "";
+      if(area>0){
+        $("itemSqft").value = area.toFixed(3);
+      }
+      return area;
+    }
+    ["itemFt","itemIn","itemFt2","itemIn2"].forEach(id=>{
+      $(id).addEventListener("input", calcSqftFromFtIn);
+    });
+
+    // ==== COMPANY SETTINGS ====
+    function updateCompanyPreview() {
+      $("previewCompanyName").textContent = $("companyName").value;
+      $("previewCompanyAddress").textContent = $("companyAddress").value;
+      $("previewCompanyPhone").textContent = $("companyPhone").value;
+      $("previewCompanyGST").textContent = $("companyGST").value;
+      $("previewLogo").src = logoData;
+      $("previewLogo").style.display = logoData ? "block" : "none";
+      localStorage.setItem("companyName", $("companyName").value);
+      localStorage.setItem("companyAddress", $("companyAddress").value);
+      localStorage.setItem("companyPhone", $("companyPhone").value);
+      localStorage.setItem("companyGST", $("companyGST").value);
+      localStorage.setItem("companyLogo", logoData);
+    }
+    ["companyName","companyAddress","companyPhone","companyGST"].forEach(id => $(id).addEventListener("input", updateCompanyPreview));
+    $("logoUpload").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) { logoData = ev.target.result; updateCompanyPreview(); }
+      reader.readAsDataURL(file);
+    });
+    $("currency").addEventListener("change", updateAll);
+    $("taxRate").addEventListener("input", updateAll);
+
+    // ==== INVOICE DETAILS ====
+    function updateCustomerPreview() {
+      ["customerName","customerAddress","customerPhone","customerGST"].forEach(id => {
+        $("preview" + id.charAt(0).toUpperCase() + id.slice(1)).textContent = $(id).value;
+      });
+    }
+    ["customerName","customerAddress","customerPhone","customerGST"].forEach(id => $(id).addEventListener("input", updateCustomerPreview));
+
+    // ==== RENTAL ITEMS ====
+    function renderItemsTable() {
+      let tbody = $("itemsTable").querySelector("tbody");
+      tbody.innerHTML = "";
+      items.forEach((it, i) => {
+        tbody.innerHTML += `<tr>
+          <td>${it.cat}</td>
+          <td>${it.desc}</td>
+          <td>${it.area}</td>
+          <td>${previewCurrency(it.rate)}</td>
+          <td>${it.discount}%</td>
+          <td>${previewCurrency(it.amount)}</td>
+          <td>${it.note||""}</td>
+          <td><button type="button" onclick="removeItem(${i})" class="btn-danger">x</button></td>
+        </tr>`;
+      });
+    }
+    
+    function renderInvoicePreview() {
+      let pbody = $("previewItems"); pbody.innerHTML = "";
+      let subtotal = 0;
+      items.forEach(it => {
+        pbody.innerHTML += `<tr>
+          <td>${it.cat}</td>
+          <td>${it.desc}</td>
+          <td>${it.area}</td>
+          <td>${previewCurrency(it.rate)}</td>
+          <td>${it.discount}%</td>
+          <td>${previewCurrency(it.amount)}</td>
+          <td>${it.note||""}</td>
+        </tr>`;
+        subtotal += it.amount;
+      });
+      $("previewSubtotal").textContent = previewCurrency(subtotal);
+      let addCharges = parseFloat($("addCharges").value)||0;
+      let totalDiscount = parseFloat($("totalDiscount").value)||0;
+      let discountAmt = subtotal * totalDiscount/100;
+      $("previewAddCharges").textContent = previewCurrency(addCharges);
+      $("previewDiscount").textContent = previewCurrency(discountAmt);
+      let taxed = Math.max(0, subtotal + addCharges - discountAmt);
+      let tax = taxed * taxRate()/100;
+      $("previewTax").textContent = previewCurrency(tax);
+      let total = taxed + tax;
+      $("previewTotal").textContent = previewCurrency(total);
+      $("previewInvoiceNote").textContent = $("invoiceNote").value;
+      $("qrCode").innerHTML = "";
+      new QRCode($("qrCode"), { text: $("invoiceNumber").textContent, width:64, height:64 });
+      updateCompanyPreview();
+      updateCustomerPreview();
+    }
+    
+    function updateAll() { renderItemsTable(); renderInvoicePreview(); }
+    
+    function addItem() {
+      let cat = $("itemCategory").value,
+          desc = $("itemDescription").value,
+          area = parseFloat($("itemSqft").value) || 0,
+          rate = parseFloat($("itemRate").value) || 0,
+          discount = parseFloat($("itemDiscount").value)||0,
+          note = $("itemNote").value;
+      if (!desc || area <= 0 || rate <= 0) return alert("Fill all item fields");
+      let amount = area * rate * (1 - discount/100);
+      items.push({ cat, desc, area, rate, discount, note, amount });
+      $("itemDescription").value = $("itemSqft").value = $("itemRate").value = $("itemDiscount").value = $("itemNote").value = "";
+      ["itemFt","itemIn","itemFt2","itemIn2"].forEach(id => $(id).value = "");
+      $("ftinResult").textContent = "";
+      updateAll();
+    }
+    
+    function removeItem(i) { items.splice(i,1); updateAll(); }
+    
+    $("addItem").onclick = addItem;
+    $("clearItems").onclick = () => { if(confirm("Clear items?")){ items=[]; updateAll(); }};
+    ["addCharges","totalDiscount","invoiceNote"].forEach(id => $(id).addEventListener("input", renderInvoicePreview));
+
+    // ==== INVOICE NUMBER, DATE, LOGO ====
+    function setupInvoice() {
+      $("invoiceDate").textContent = new Date().toLocaleDateString();
+      $("invoiceNumber").textContent = genInvoiceNum();
+      logoData = localStorage.getItem("companyLogo") || "";
+      $("previewLogo").src = logoData;
+      $("previewLogo").style.display = logoData ? "block":"none";
+      $("companyName").value = localStorage.getItem("companyName") || "J/s Enterprise";
+      $("companyAddress").value = localStorage.getItem("companyAddress") || "Narayanganj, Bangladesh";
+      $("companyPhone").value = localStorage.getItem("companyPhone") || "01994316210";
+      $("companyGST").value = localStorage.getItem("companyGST") || "27ABCDE1234F1Z2";
+      
+      // Apply settings
+      if (settings.taxRate) $("taxRate").value = settings.taxRate;
+      if (settings.currency) $("currency").value = settings.currency;
+      
+      updateCompanyPreview();
+      renderInvoicePreview();
+    }
+    
+    setupInvoice();
+
+    // ==== PDF Export ====
+    function downloadPDF() {
+      const el = $("billPreview");
+      if (!el) {
+        alert("Bill preview area not found!");
+        return;
+      }
+      html2pdf().set({ 
+        filename: $("invoiceNumber").textContent + ".pdf",
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(el).save();
+    }
+
+    // ==== CSV/Excel Export ====
+    function exportCSV() {
+      if (!items.length) {
+        alert("There are no items to export.");
+        return;
+      }
+      let csv = "Category,Description,Area,Rate,Discount,Amount,Note\n" +
+        items.map(it => `${it.cat},${it.desc},${it.area},${it.rate},${it.discount},${it.amount},${it.note||""}`).join("\n");
+      let blob = new Blob([csv], {type:"text/csv"});
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = "items.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    
+    function exportExcel() {
+      alert("Excel export: Please use CSV export and open in Excel (or integrate SheetJS)");
+    }
+
+    // ==== Email Invoice (stub, ready for integration) ====
+    function sendEmail() {
+      let email = prompt("Enter recipient email:");
+      if(!email) return;
+      alert("Email sent to " + email + " (Feature: connect to EmailJS or backend API for real email sending.)");
+    }
+
+    // ==== Dashboard ====
+    function showDashboard() {
+      let dash = invoices.slice(-20).reverse().map(inv => `
+        <div class="dashboard-item">
+          <div class="project-header">
+            <b>${inv.number}</b> — ${inv.date}
+            <span class="status-badge status-${inv.status || 'draft'}">${inv.status || 'draft'}</span>
+          </div>
+          <span>${inv.customer.name}</span> | <span>${inv.total}</span>
+          <div class="project-meta">
+            Project: ${projects.find(p => p.id === inv.projectId)?.name || 'Unknown'}
+          </div>
+        </div>`).join("");
+      $("analyticsBoard").innerHTML = `<h4>Recent Invoices</h4>${dash || "No invoices yet."}`;
+    }
+
+    // ==== Settings Management ====
+    function saveSettings() {
+      settings.taxRate = parseFloat($("defaultTaxRate").value) || 18;
+      settings.currency = $("defaultCurrency").value;
+      settings.invoiceFormat = $("invoiceFormat").value;
+      localStorage.setItem("appSettings", JSON.stringify(settings));
+      alert("Settings saved!");
+      
+      // Apply settings to current invoice
+      $("taxRate").value = settings.taxRate;
+      $("currency").value = settings.currency;
+      updateAll();
+    }
+
+    // ==== Reset Form ====
+    function resetForm() {
+      if(!confirm("Reset all fields?")) return;
+      ["customerName","customerAddress","customerPhone","customerGST","itemDescription","itemSqft","itemRate","itemDiscount","itemNote","addCharges","totalDiscount","invoiceNote"].forEach(id=>{
+        if($(id).type=="number"||$(id).type=="text") $(id).value = "";
+        else $(id).value = "";
+      });
+      items = [];
+      setupInvoice();
+      updateAll();
+    }
+
+    // ==== Print ====
+    function printInvoice() {
+      window.print();
+    }
+
+    // ==== Language Switch ====
+    function setLang(lang) {
+      alert("Language change: " + lang + " (Stub. For real i18n, integrate i18next or similar, and provide UI translations)");
+    }
+
+    // ==== Auth (stub) ====
+    function showLogin() {
+      let name = prompt("Enter username:");
+      if(name) { 
+        user = name; 
+        $("loginBtn").style.display="none"; 
+        $("logoutBtn").style.display="inline-block"; 
+        alert("Logged in as "+name);
+      }
+    }
+    
+    function logout() {
+      user = null; 
+      $("loginBtn").style.display="inline-block"; 
+      $("logoutBtn").style.display="none";
+      alert("Logged out.");
+    }
+
+    // ==== On Load: Update all ====
+    updateProjectSelector();
+    updateAll();
+  </script>
+</body>
+</html>
