@@ -1,0 +1,44 @@
+name: Generate PWA Icons
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'generate-icons.js'
+      - 'package.json'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  generate-icons:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install system dependencies for canvas
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
+
+    - name: Install npm dependencies
+      run: npm install
+
+    - name: Generate icons
+      run: npm run generate-icons
+
+    - name: Commit generated icons
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add icons/
+        git commit -m "Auto-generated PWA icons [skip ci]" || echo "No changes to commit"
+        git push
