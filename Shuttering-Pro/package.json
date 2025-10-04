@@ -1,0 +1,19 @@
+{
+  "name": "shuttering-pro-icons",
+  "version": "1.0.0",
+  "description": "Icon generator for Shuttering/Formwork Pro PWA",
+  "main": "generate-icons.js",
+  "scripts": {
+    "generate-icons": "node generate-icons.js",
+    "build": "npm run generate-icons"
+  },
+  "keywords": ["pwa", "icons", "generator", "construction"],
+  "author": "Sabuj",
+  "license": "MIT",
+  "dependencies": {
+    "canvas": "^2.11.2"
+  },
+  "devDependencies": {
+    "node": "^16.0.0"
+  }
+}
