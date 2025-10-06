@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>J/s Enterprise - Building Construction and Shuttering/Formwork Provider</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     /* Reset */
     * {
@@ -13,35 +14,30 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --primary: #3e0061;
+      --secondary: #ff9800;
+      --dark: #1a0033;
+      --light: #f8f9fa;
+      --text: #333;
+      --text-light: #fff;
+    }
+
     body {
       font-family: "Segoe UI", Arial, sans-serif;
-      background-color: #3e0061f9;
-      color: #ffffffc4;
+      background-color: var(--light);
+      color: var(--text);
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
     header {
-      background: url("") center no-repeat;
-      color: white;
+      background: linear-gradient(rgba(62, 0, 97, 0.8), rgba(26, 0, 51, 0.9)), 
+                  url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') center/cover no-repeat;
+      color: var(--text-light);
       text-align: center;
       padding: 100px 20px;
       position: relative;
-    }
-
-    header::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-    }
-
-    header h1,
-    header p {
-      position: relative;
-      z-index: 1;
     }
 
     /* Responsive Header Logo */
@@ -85,18 +81,57 @@
     header h1 {
       font-size: 3rem;
       margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     header p {
       font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .header-cta {
+      margin-top: 30px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      background-color: var(--secondary);
+      color: var(--dark);
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .btn:hover {
+      background-color: #ffb347;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 2px solid var(--secondary);
+      color: var(--text-light);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--secondary);
+      color: var(--dark);
     }
 
     nav {
-      background-color: #222;
-      padding: 10px 0;
+      background-color: var(--dark);
+      padding: 15px 0;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     nav ul {
@@ -115,138 +150,285 @@
       text-decoration: none;
       font-weight: bold;
       transition: color 0.3s;
+      position: relative;
+      padding: 5px 0;
+    }
+
+    nav ul li a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--secondary);
+      transition: width 0.3s;
+    }
+
+    nav ul li a:hover::after,
+    nav ul li a.active::after {
+      width: 100%;
     }
 
     nav ul li a:hover {
-      color: #ff9800;
+      color: var(--secondary);
     }
 
     section {
-      padding: 60px 20px;
-      max-width: 1100px;
+      padding: 80px 20px;
+      max-width: 1200px;
       margin: auto;
     }
 
     section h2 {
       text-align: center;
-      margin-bottom: 30px;
-      font-size: 2rem;
-      color: #444;
+      margin-bottom: 50px;
+      font-size: 2.5rem;
+      color: var(--primary);
       position: relative;
     }
 
     section h2::after {
       content: "";
       display: block;
-      width: 60px;
+      width: 80px;
       height: 4px;
-      background: #ff9800;
-      margin: 10px auto 0;
+      background: var(--secondary);
+      margin: 15px auto 0;
       border-radius: 2px;
     }
 
     /* About */
+    .about {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      padding: 40px;
+    }
+
     .about p {
       text-align: center;
       max-width: 800px;
-      margin: auto;
+      margin: 20px auto;
       font-size: 1.1rem;
+      line-height: 1.8;
+    }
+
+    .about-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .feature {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .feature i {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    .feature h3 {
+      margin-bottom: 10px;
+      color: var(--primary);
     }
 
     /* Services */
     .services {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
     }
 
     .service-card {
       background: white;
-      padding: 20px;
+      padding: 30px;
       border-radius: 10px;
       text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--secondary);
     }
 
     .service-card:hover {
-      transform: translateY(-8px);
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
     }
 
     .service-card img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
       border-radius: 8px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .service-card h3 {
-      margin-bottom: 10px;
-      color: #ff9800;
+      margin-bottom: 15px;
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .service-card p {
+      margin-bottom: 20px;
     }
 
     /* Projects */
     .projects {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+
+    .project {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      height: 250px;
     }
 
     .project img {
       width: 100%;
-      border-radius: 10px;
-      height: 200px;
+      height: 100%;
       object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .project:hover img {
+      transform: scale(1.1);
+    }
+
+    .project-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      padding: 20px;
+      color: white;
+      transform: translateY(100%);
       transition: transform 0.3s;
     }
 
-    .project img:hover {
-      transform: scale(1.05);
+    .project:hover .project-overlay {
+      transform: translateY(0);
     }
 
     /* Contact */
     .contact {
-      text-align: center;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      padding: 40px;
     }
 
-    .contact p {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
+    .contact-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .contact-item i {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-right: 15px;
+      width: 40px;
+    }
+
+    .contact-item p {
+      margin: 0;
     }
 
     .contact a {
-      color: #ff9800;
+      color: var(--secondary);
       text-decoration: none;
       font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    .contact a:hover {
+      color: var(--primary);
+      text-decoration: underline;
     }
 
     /* Contact Form */
     .contact-form {
-      max-width: 600px;
-      margin: 30px auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 30px auto 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .contact-form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--primary);
     }
 
     .contact-form input,
-    .contact-form textarea {
+    .contact-form textarea,
+    .contact-form select {
       width: 100%;
-      padding: 12px;
+      padding: 12px 15px;
       margin: 8px 0;
       border-radius: 5px;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       font-size: 1rem;
+      transition: border 0.3s;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus,
+    .contact-form select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(62, 0, 97, 0.1);
     }
 
     .contact-form button {
       width: 100%;
-      padding: 12px;
-      background: #ff9800;
+      padding: 15px;
+      background: var(--secondary);
       border: none;
-      color: white;
+      color: var(--dark);
       font-size: 1.1rem;
       font-weight: bold;
       border-radius: 5px;
@@ -255,324 +437,679 @@
     }
 
     .contact-form button:hover {
-      background: #e68900;
+      background: #ffb347;
     }
 
     footer {
-      background: #222;
+      background: var(--dark);
       color: white;
       text-align: center;
-      padding: 15px;
+      padding: 40px 20px;
       margin-top: 40px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      text-align: left;
+    }
+
+    .footer-section h3 {
+      color: var(--secondary);
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+
+    .footer-section p {
+      margin-bottom: 15px;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 10px;
+    }
+
+    .footer-section ul li a {
+      color: #ddd;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-section ul li a:hover {
+      color: var(--secondary);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      color: white;
+      transition: all 0.3s;
+    }
+
+    .social-links a:hover {
+      background: var(--secondary);
+      color: var(--dark);
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Calculator Styles */
+    .calculator-section {
+      background: var(--primary);
+      color: white;
+      border-radius: 10px;
+      padding: 40px;
+      margin-top: 40px;
+    }
+
+    .calculator-section h3 {
+      color: var(--secondary);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    #formwork-calculator {
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    #formwork-calculator h4, 
+    #formwork-calculator h5 {
+      color: var(--secondary);
+      margin-bottom: 15px;
+    }
+
+    #formwork-calculator .form-group { 
+      background: rgba(255,255,255,0.05); 
+      padding: 20px; 
+      border-radius: 8px; 
+      margin-bottom: 20px; 
+    }
+
+    #formwork-calculator .input-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    #formwork-calculator .input-group label {
+      flex: 1;
+      font-weight: bold;
+      color: var(--secondary);
+    }
+
+    #formwork-calculator .input-group input,
+    #formwork-calculator select {
+      flex: 2;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 2px solid var(--secondary);
+      border-radius: 5px;
+    }
+
+    #formwork-calculator .input-duo {
+      display: flex;
+      gap: 5px;
+      flex: 2;
+    }
+
+    #formwork-calculator button { 
+      background: var(--secondary); 
+      color: var(--primary); 
+      padding: 12px 20px; 
+      border: none; 
+      cursor: pointer; 
+      margin: 5px 5px 5px 0; 
+      border-radius: 5px; 
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    #formwork-calculator button:hover { 
+      background: #ffb347; 
+    }
+
+    #formwork-calculator #result { 
+      background: rgba(255,255,255,0.08);
+      padding: 20px; 
+      border-radius: 8px; 
+      margin-top: 20px;
+      color: #fff;
+    }
+
+    #formwork-calculator .structure-type { 
+      margin: 20px 0; 
+      padding: 15px; 
+      background: rgba(255,255,255,0.05); 
+      border-radius: 5px; 
+    }
+
+    .calculator-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* Back to Top Button */
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--secondary);
+      color: var(--dark);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 99;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .back-to-top.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .back-to-top:hover {
+      background: #ffb347;
+      transform: translateY(-3px);
     }
   </style>
 </head>
 
 <body>
   <header>
-    <img class="header-logo" src="/img/file_00000000e354620ab6ca43b7cf7a45c0.png" alt="J/s Enterprise Logo">
+    <img class="header-logo" src="https://github.com/sabujdotnet/sabujdotnet.github.io/blob/main/img/logo.png?raw=true" alt="J/s Enterprise Logo">
     <h1>J/s Enterprise</h1>
     <p>Building Construction & Shuttering/Formwork Provider</p>
+    <div class="header-cta">
+      <a href="#contact" class="btn">Get a Quote</a>
+      <a href="#services" class="btn btn-outline">Our Services</a>
+    </div>
   </header>
 
   <nav>
     <ul>
-      <li><a href="#about">About</a></li>
+      <li><a href="#about" class="active">About</a></li>
       <li><a href="#services">Services</a></li>
       <li><a href="#projects">Projects</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
 
-  
+  <section id="about">
+    <h2>About Us</h2>
+    <div class="about">
+      <p>J/s Enterprise is a leading provider of building construction and shuttering/formwork solutions in Bangladesh. With years of experience and a commitment to quality, we deliver exceptional results for residential, commercial, and infrastructure projects.</p>
+      <p>Our team of skilled professionals uses the latest techniques and high-quality materials to ensure that every project meets the highest standards of safety, durability, and aesthetic appeal.</p>
+      
+      <div class="about-features">
+        <div class="feature">
+          <i class="fas fa-hard-hat"></i>
+          <h3>Expert Team</h3>
+          <p>Skilled professionals with years of experience in construction and formwork.</p>
+        </div>
+        <div class="feature">
+          <i class="fas fa-tools"></i>
+          <h3>Quality Materials</h3>
+          <p>We use only the highest quality materials for all our construction projects.</p>
+        </div>
+        <div class="feature">
+          <i class="fas fa-award"></i>
+          <h3>Proven Track Record</h3>
+          <p>Successfully completed numerous projects with satisfied clients.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  
   <section id="services">
-  <h2>Our Services</h2>
-  <div class="services">
-    <div class="service-card">
-      <img src="https://images.unsplash.com/photo-1590490359683-1fc3ab64a87b" alt="Building Construction">
-      <h3>Building Construction</h3>
-      <p>From foundations to finishing, we provide complete building solutions with high-quality materials and skilled craftsmanship.</p>
-    </div>
-    <div class="service-card">
-      <img src="https://images.unsplash.com/photo-1574692073595-d2d4f78c0dff" alt="Shuttering Formwork">
-      <h3>Shuttering / Formwork</h3>
-      <p>Efficient and strong shuttering solutions for all types of construction projects ensuring safety and accuracy.</p>
-    </div>
-    <div class="service-card">
-      <img src="https://images.unsplash.com/photo-1523413651479-597eb2da0ad6" alt="Customized Design">
-      <h3>Customized Formwork</h3>
-      <p>We design and provide tailored formwork solutions to meet your unique construction requirements.</p>
+    <h2>Our Services</h2>
+    <div class="services">
+      <div class="service-card">
+        <img src="https://images.unsplash.com/photo-1590490359683-1fc3ab64a87b" alt="Building Construction">
+        <h3>Building Construction</h3>
+        <p>From foundations to finishing, we provide complete building solutions with high-quality materials and skilled craftsmanship.</p>
+        <a href="#contact" class="btn">Learn More</a>
+      </div>
+      <div class="service-card">
+        <img src="https://images.unsplash.com/photo-1574692073595-d2d4f78c0dff" alt="Shuttering Formwork">
+        <h3>Shuttering / Formwork</h3>
+        <p>Efficient and strong shuttering solutions for all types of construction projects ensuring safety and accuracy.</p>
+        <a href="#contact" class="btn">Learn More</a>
+      </div>
+      <div class="service-card">
+        <img src="https://images.unsplash.com/photo-1523413651479-597eb2da0ad6" alt="Customized Design">
+        <h3>Customized Formwork</h3>
+        <p>We design and provide tailored formwork solutions to meet your unique construction requirements.</p>
+        <a href="#contact" class="btn">Learn More</a>
+      </div>
     </div>
 
-    <!-- NEW: Themed Formwork Calculator -->
-    <div class="service-card" style="grid-column: 1 / -1; background:#3e0061; color:#fff; text-align:left;">
-        <img src="https://raw.githubusercontent.com/sabujdotnet/sabujdotnet.github.io/refs/heads/main/img/file_00000000e354620ab6ca43b7cf7a45c0.png" ...>
-      <h3 style="color:#6acbff;">Formwork Material Calculator</h3>
+    <!-- Formwork Calculator -->
+    <div class="calculator-section">
+      <h3>Formwork Material Calculator</h3>
       <p>Use our built-in calculator to estimate shuttering/formwork material needs quickly and accurately.</p>
 
-      <style>
-        /* Scoped purple/yellow theme for calculator */
-        #formwork-calculator {
-          font-family: "Segoe UI", Arial, sans-serif;
-          margin-top: 20px;
-        }
-        #formwork-calculator h4, 
-        #formwork-calculator h5 {
-          color: #ff9800;
-          margin-bottom: 10px;
-        }
-        #formwork-calculator .form-group { 
-            background: rgba(255,255,255,0.05); 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 15px; 
-        }
-        #formwork-calculator .input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        #formwork-calculator .input-group label {
-            flex: 1;
-            font-weight: bold;
-            color: #ff9800;
-        }
-        #formwork-calculator .input-group input,
-        #formwork-calculator select {
-            flex: 2;
-            padding: 8px;
-            background: #2a003f;
-            color: #fff;
-            border: 2px solid #ff9800;
-            border-radius: 5px;
-        }
-        #formwork-calculator .input-duo {
-            display: flex;
-            gap: 5px;
-            flex: 2;
-        }
-        #formwork-calculator button { 
-            background: #ff9800; 
-            color: #3e0061; 
-            padding: 12px 20px; 
-            border: none; 
-            cursor: pointer; 
-            margin: 5px 5px 5px 0; 
-            border-radius: 5px; 
-            font-weight: bold;
-        }
-        #formwork-calculator button:hover { 
-            background: #e68900; 
-            transition: 0.2s; 
-        }
-        #formwork-calculator #result { 
-            background: rgba(255,255,255,0.08);
-            padding: 20px; 
-            border-radius: 8px; 
-            margin-top: 20px;
-            color: #fff;
-        }
-        #formwork-calculator .structure-type { 
-            margin: 20px 0; 
-            padding: 15px; 
-            background: #2a003f; 
-            border-radius: 5px; 
-        }
-      </style>
-
       <div id="formwork-calculator">
-        <h4>Shuttering | Formwork Material Estimator (Square Feet)</h4>
-
         <div class="form-group">
-            <label for="structureType">Select Structure Type:</label>
-            <select id="structureType" onchange="showStructureInputs()">
-                <option value="wall">Wall (Rectangular)</option>
-                <option value="beam">Beam</option>
-                <option value="column">Column (Rectangular)</option>
-                <option value="roundColumn">Column (Round)</option>
-                <option value="slab">Slab</option>
-                <option value="stair">Staircase</option>
-                <option value="custom">Custom Structure</option>
-            </select>
+          <label for="structureType">Select Structure Type:</label>
+          <select id="structureType" onchange="showStructureInputs()">
+            <option value="wall">Wall (Rectangular)</option>
+            <option value="beam">Beam</option>
+            <option value="column">Column (Rectangular)</option>
+            <option value="roundColumn">Column (Round)</option>
+            <option value="slab">Slab</option>
+            <option value="stair">Staircase</option>
+            <option value="custom">Custom Structure</option>
+          </select>
         </div>
 
         <div class="form-group">
-            <label for="wastage">Wastage Percentage (%):</label>
-            <input type="number" id="wastage" value="5" min="0" max="50" required>
+          <label for="wastage">Wastage Percentage (%):</label>
+          <input type="number" id="wastage" value="5" min="0" max="50" required>
         </div>
 
         <div class="form-group">
-            <label for="plywoodSize">plywood Sheet Size (sqf, e.g., 4x8):</label>
-            <input type="text" id="plywoodSize" value="4x8" required>
+          <label for="plywoodSize">Plywood Sheet Size (sqf, e.g., 4x8):</label>
+          <input type="text" id="plywoodSize" value="4x8" required>
         </div>
 
         <div class="form-group">
-            <label>Material Rate (Optional, ৳/sqf):</label>
-            <input type="number" id="materialRate" placeholder="Enter rate per square foot" step="0.01">
+          <label for="materialRate">Material Rate (Optional, ৳/sqf):</label>
+          <input type="number" id="materialRate" placeholder="Enter rate per square foot" step="0.01">
         </div>
 
         <div id="structureInputs"></div>
 
-        <button type="button" onclick="calculateFormwork()">Calculate Materials</button>
-        <button type="button" onclick="saveResults()">Save Results</button>
-        <button type="button" onclick="window.print()">Print Results</button>
+        <div class="calculator-actions">
+          <button type="button" onclick="calculateFormwork()">Calculate Materials</button>
+          <button type="button" onclick="saveResults()">Save Results</button>
+          <button type="button" onclick="window.print()">Print Results</button>
+          <button type="button" onclick="resetCalculator()">Reset</button>
+        </div>
         <div id="result"></div>
       </div>
-
-      <script>
-        // same JS functions from before...
-        function convertToFeet(ft, inch) {
-            const feet = parseFloat(ft) || 0;
-            const inches = parseFloat(inch) || 0;
-            return feet + inches / 12;
-        }
-        function showStructureInputs() {
-            const type = document.getElementById('structureType').value;
-            let inputs = '';
-            const dimensionTemplate = (label, idPrefix) => `
-                <div class="input-group">
-                    <label>${label}:</label>
-                    <div class="input-duo">
-                        <input type="number" id="${idPrefix}Ft" placeholder="ft">
-                        <input type="number" id="${idPrefix}Inch" placeholder="inch" min="0" max="11">
-                    </div>
-                </div>
-            `;
-            switch(type) {
-                case 'wall':
-                    inputs = `<div class="structure-type"><h4>Wall Dimensions</h4>
-                        ${dimensionTemplate('Length', 'wallLength')}
-                        ${dimensionTemplate('Height', 'wallHeight')}</div>`; break;
-                case 'beam':
-                    inputs = `<div class="structure-type"><h4>Beam Dimensions</h4>
-                        <div class="input-group"><label>Number of Beams:</label><input type="number" id="beamCount" value="1"></div>
-                        ${dimensionTemplate('Length', 'beamLength')}
-                        ${dimensionTemplate('Width', 'beamWidth')}
-                        ${dimensionTemplate('Height', 'beamHeight')}</div>`; break;
-                case 'column':
-                    inputs = `<div class="structure-type"><h4>Rectangular Column Dimensions</h4>
-                        <div class="input-group"><label>Number of Columns:</label><input type="number" id="colCount" value="1"></div>
-                        ${dimensionTemplate('Length', 'colLength')}
-                        ${dimensionTemplate('Width', 'colWidth')}
-                        ${dimensionTemplate('Height', 'colHeight')}</div>`; break;
-                case 'roundColumn':
-                    inputs = `<div class="structure-type"><h4>Round Column Dimensions</h4>
-                        <div class="input-group"><label>Number of Columns:</label><input type="number" id="roundColCount" value="1"></div>
-                        ${dimensionTemplate('Diameter', 'roundColDiameter')}
-                        ${dimensionTemplate('Height', 'roundColHeight')}</div>`; break;
-                case 'slab':
-                    inputs = `<div class="structure-type"><h4>Slab Dimensions</h4>
-                        <div class="input-group"><label>Number of Slabs:</label><input type="number" id="slabCount" value="1"></div>
-                        ${dimensionTemplate('Length', 'slabLength')}
-                        ${dimensionTemplate('Width', 'slabWidth')}</div>`; break;
-                case 'stair':
-                    inputs = `<div class="structure-type"><h4>Staircase Dimensions</h4>
-                        ${dimensionTemplate('Rise per Step', 'stairRise')}
-                        ${dimensionTemplate('Tread per Step', 'stairTread')}
-                        <div class="input-group"><label>Number of Steps:</label><input type="number" id="stairSteps"></div>
-                        ${dimensionTemplate('Width', 'stairWidth')}</div>`; break;
-                case 'custom':
-                    inputs = `<div class="structure-type"><h4>Custom Structure</h4>
-                        <div class="input-group"><label>Total Formwork Area (sqft):</label><input type="number" id="customAreaFt"></div></div>`; break;
-            }
-            document.getElementById('structureInputs').innerHTML = inputs;
-        }
-        function calculateFormwork() {
-            const type = document.getElementById('structureType').value;
-            const wastage = parseFloat(document.getElementById('wastage').value);
-            const plywoodSize = document.getElementById('plywoodSize').value.split('x').map(Number);
-            const materialRate = parseFloat(document.getElementById('materialRate').value) || 0;
-            let formworkArea = 0, count = 1;
-            if (plywoodSize.length !== 2) { alert("Plywood size must be like 4x8"); return; }
-            switch(type) {
-                case 'wall':
-                    formworkArea = convertToFeet(wallLengthFt.value, wallLengthInch.value) *
-                                   convertToFeet(wallHeightFt.value, wallHeightInch.value) * 2; break;
-                case 'beam':
-                    count = parseInt(beamCount.value)||1;
-                    formworkArea = (2*convertToFeet(beamHeightFt.value,beamHeightInch.value)+
-                                    convertToFeet(beamWidthFt.value,beamWidthInch.value)) *
-                                    convertToFeet(beamLengthFt.value,beamLengthInch.value) * count; break;
-                case 'column':
-                    count = parseInt(colCount.value)||1;
-                    formworkArea = 2*(convertToFeet(colLengthFt.value,colLengthInch.value)+
-                                      convertToFeet(colWidthFt.value,colWidthInch.value)) *
-                                      convertToFeet(colHeightFt.value,colHeightInch.value) * count; break;
-                case 'roundColumn':
-                    count = parseInt(roundColCount.value)||1;
-                    formworkArea = Math.PI * convertToFeet(roundColDiameterFt.value,roundColDiameterInch.value) *
-                                   convertToFeet(roundColHeightFt.value,roundColHeightInch.value) * count; break;
-                case 'slab':
-                    count = parseInt(slabCount.value)||1;
-                    formworkArea = convertToFeet(slabLengthFt.value,slabLengthInch.value) *
-                                   convertToFeet(slabWidthFt.value,slabWidthInch.value) * count; break;
-                case 'stair':
-                    formworkArea = (convertToFeet(stairRiseFt.value,stairRiseInch.value)*stairSteps.value*convertToFeet(stairWidthFt.value,stairWidthInch.value)) +
-                                   (convertToFeet(stairTreadFt.value,stairTreadInch.value)*stairSteps.value*convertToFeet(stairWidthFt.value,stairWidthInch.value)); break;
-                case 'custom':
-                    formworkArea = parseFloat(customAreaFt.value)||0; break;
-            }
-            const totalArea = formworkArea * (1+wastage/100);
-            const sheetsNeeded = Math.ceil(totalArea / (plywoodSize[0]*plywoodSize[1]));
-            const totalCost = materialRate * totalArea;
-            let html = `<h5>Results</h5>
-                        <p>Formwork Area: ${formworkArea.toFixed(2)} sqft</p>
-                        <p>Total Area (with wastage): ${totalArea.toFixed(2)} sqft</p>
-                        <p>Plywood Sheets Needed: ${sheetsNeeded}</p>`;
-            if(materialRate>0) html += `<p>Estimated Material Cost: ৳${totalCost.toFixed(2)}</p>`;
-            document.getElementById('result').innerHTML = html;
-        }
-        function saveResults() {
-            if(!result.innerHTML) { alert("Please calculate first"); return; }
-            const blob = new Blob([result.innerHTML],{type:'text/html'});
-            const url = URL.createObjectURL(blob);
-            const a=document.createElement('a'); a.href=url; a.download='formwork_results.html';
-            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        }
-        showStructureInputs();
-      </script>
     </div>
-  </div>
-</section>
+  </section>
 
   <section id="projects">
     <h2>Our Projects</h2>
     <div class="projects">
       <div class="project">
         <img src="https://images.unsplash.com/photo-1581090700227-4c4d6cc3b6b0" alt="Residential Project">
+        <div class="project-overlay">
+          <h3>Residential Building</h3>
+          <p>Completed in 2023</p>
+        </div>
       </div>
       <div class="project">
         <img src="https://images.unsplash.com/photo-1581092919534-7ad3a9a3c9b0" alt="Commercial Project">
+        <div class="project-overlay">
+          <h3>Commercial Complex</h3>
+          <p>Completed in 2022</p>
+        </div>
       </div>
       <div class="project">
         <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e" alt="Infrastructure Project">
+        <div class="project-overlay">
+          <h3>Bridge Construction</h3>
+          <p>Completed in 2021</p>
+        </div>
       </div>
     </div>
   </section>
 
   <section id="contact" class="contact">
     <h2>Contact Us</h2>
-    <p>Email: <a href="mailto:js.enterprise@gmail.com">info@jsenterprise.com</a></p>
-    <p>Phone: <a href="tel:+8801994316210">+8801994316210</a></p>
-    <p>Address: 18/3 Water Works Road, Narayanganj, Bangladesh</p>
+    <div class="contact-info">
+      <div>
+        <div class="contact-item">
+          <i class="fas fa-envelope"></i>
+          <p>Email: <a href="mailto:js.enterprise@gmail.com">info@jsenterprise.com</a></p>
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-phone"></i>
+          <p>Phone: <a href="tel:+8801994316210">+8801994316210</a></p>
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <p>Address: 18/3 Water Workers Road, Narayanganj Sadar, Bangladesh</p>
+        </div>
+      </div>
+      <div>
+        <h3>Business Hours</h3>
+        <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+        <p>Saturday: 9:00 AM - 2:00 PM</p>
+        <p>Sunday: Closed</p>
+      </div>
+    </div>
 
     <div class="contact-form">
-      <form action="mailto:info@jsenterprise.com" method="post" enctype="text/plain">
-        <input type="text" name="name" placeholder="Your Name" required>
-        <input type="email" name="email" placeholder="Your Email" required>
-        <input type="tel" name="phone" placeholder="Your Phone">
-        <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+      <form id="contactForm" method="post">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="email" placeholder="Your Email" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="phone">Your Phone</label>
+          <input type="tel" id="phone" name="phone" placeholder="Your Phone">
+        </div>
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" placeholder="Subject">
+        </div>
+        <div class="form-group">
+          <label for="message">Your Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="Your Message" required></textarea>
+        </div>
         <button type="submit">Send Message</button>
       </form>
     </div>
   </section>
 
   <footer>
-    <p>&copy; 2025 J/s Enterprise. All rights reserved.</p>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>J/s Enterprise</h3>
+        <p>Your trusted partner for building construction and shuttering/formwork solutions in Bangladesh.</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Our Services</h3>
+        <ul>
+          <li><a href="#services">Building Construction</a></li>
+          <li><a href="#services">Shuttering/Formwork</a></li>
+          <li><a href="#services">Customized Formwork</a></li>
+          <li><a href="#services">Consultation</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; 2025 J/s Enterprise. All rights reserved.</p>
+    </div>
   </footer>
+
+  <div class="back-to-top" id="backToTop">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+
+  <script>
+    // Fixed Formwork Calculator Functions
+    function convertToFeet(ft, inch) {
+      const feet = parseFloat(ft) || 0;
+      const inches = parseFloat(inch) || 0;
+      return feet + inches / 12;
+    }
+
+    function showStructureInputs() {
+      const type = document.getElementById('structureType').value;
+      let inputs = '';
+      const dimensionTemplate = (label, idPrefix) => `
+        <div class="input-group">
+          <label>${label}:</label>
+          <div class="input-duo">
+            <input type="number" id="${idPrefix}Ft" placeholder="ft">
+            <input type="number" id="${idPrefix}Inch" placeholder="inch" min="0" max="11">
+          </div>
+        </div>
+      `;
+      
+      switch(type) {
+        case 'wall':
+          inputs = `<div class="structure-type"><h4>Wall Dimensions</h4>
+            ${dimensionTemplate('Length', 'wallLength')}
+            ${dimensionTemplate('Height', 'wallHeight')}</div>`;
+          break;
+        case 'beam':
+          inputs = `<div class="structure-type"><h4>Beam Dimensions</h4>
+            <div class="input-group"><label>Number of Beams:</label><input type="number" id="beamCount" value="1"></div>
+            ${dimensionTemplate('Length', 'beamLength')}
+            ${dimensionTemplate('Width', 'beamWidth')}
+            ${dimensionTemplate('Height', 'beamHeight')}</div>`;
+          break;
+        case 'column':
+          inputs = `<div class="structure-type"><h4>Rectangular Column Dimensions</h4>
+            <div class="input-group"><label>Number of Columns:</label><input type="number" id="colCount" value="1"></div>
+            ${dimensionTemplate('Length', 'colLength')}
+            ${dimensionTemplate('Width', 'colWidth')}
+            ${dimensionTemplate('Height', 'colHeight')}</div>`;
+          break;
+        case 'roundColumn':
+          inputs = `<div class="structure-type"><h4>Round Column Dimensions</h4>
+            <div class="input-group"><label>Number of Columns:</label><input type="number" id="roundColCount" value="1"></div>
+            ${dimensionTemplate('Diameter', 'roundColDiameter')}
+            ${dimensionTemplate('Height', 'roundColHeight')}</div>`;
+          break;
+        case 'slab':
+          inputs = `<div class="structure-type"><h4>Slab Dimensions</h4>
+            <div class="input-group"><label>Number of Slabs:</label><input type="number" id="slabCount" value="1"></div>
+            ${dimensionTemplate('Length', 'slabLength')}
+            ${dimensionTemplate('Width', 'slabWidth')}</div>`;
+          break;
+        case 'stair':
+          inputs = `<div class="structure-type"><h4>Staircase Dimensions</h4>
+            ${dimensionTemplate('Rise per Step', 'stairRise')}
+            ${dimensionTemplate('Tread per Step', 'stairTread')}
+            <div class="input-group"><label>Number of Steps:</label><input type="number" id="stairSteps"></div>
+            ${dimensionTemplate('Width', 'stairWidth')}</div>`;
+          break;
+        case 'custom':
+          inputs = `<div class="structure-type"><h4>Custom Structure</h4>
+            <div class="input-group"><label>Total Formwork Area (sqft):</label><input type="number" id="customAreaFt"></div></div>`;
+          break;
+      }
+      document.getElementById('structureInputs').innerHTML = inputs;
+    }
+
+    function calculateFormwork() {
+      const type = document.getElementById('structureType').value;
+      const wastage = parseFloat(document.getElementById('wastage').value);
+      const plywoodSize = document.getElementById('plywoodSize').value.split('x').map(Number);
+      const materialRate = parseFloat(document.getElementById('materialRate').value) || 0;
+      let formworkArea = 0, count = 1;
+      
+      if (plywoodSize.length !== 2) { 
+        alert("Plywood size must be like 4x8"); 
+        return; 
+      }
+      
+      switch(type) {
+        case 'wall':
+          formworkArea = convertToFeet(document.getElementById('wallLengthFt').value, document.getElementById('wallLengthInch').value) *
+                        convertToFeet(document.getElementById('wallHeightFt').value, document.getElementById('wallHeightInch').value) * 2; 
+          break;
+        case 'beam':
+          count = parseInt(document.getElementById('beamCount').value) || 1;
+          formworkArea = (2 * convertToFeet(document.getElementById('beamHeightFt').value, document.getElementById('beamHeightInch').value) +
+                         convertToFeet(document.getElementById('beamWidthFt').value, document.getElementById('beamWidthInch').value)) *
+                        convertToFeet(document.getElementById('beamLengthFt').value, document.getElementById('beamLengthInch').value) * count; 
+          break;
+        case 'column':
+          count = parseInt(document.getElementById('colCount').value) || 1;
+          formworkArea = 2 * (convertToFeet(document.getElementById('colLengthFt').value, document.getElementById('colLengthInch').value) +
+                             convertToFeet(document.getElementById('colWidthFt').value, document.getElementById('colWidthInch').value)) *
+                        convertToFeet(document.getElementById('colHeightFt').value, document.getElementById('colHeightInch').value) * count; 
+          break;
+        case 'roundColumn':
+          count = parseInt(document.getElementById('roundColCount').value) || 1;
+          formworkArea = Math.PI * convertToFeet(document.getElementById('roundColDiameterFt').value, document.getElementById('roundColDiameterInch').value) *
+                        convertToFeet(document.getElementById('roundColHeightFt').value, document.getElementById('roundColHeightInch').value) * count; 
+          break;
+        case 'slab':
+          count = parseInt(document.getElementById('slabCount').value) || 1;
+          formworkArea = convertToFeet(document.getElementById('slabLengthFt').value, document.getElementById('slabLengthInch').value) *
+                        convertToFeet(document.getElementById('slabWidthFt').value, document.getElementById('slabWidthInch').value) * count; 
+          break;
+        case 'stair':
+          const steps = parseInt(document.getElementById('stairSteps').value) || 1;
+          formworkArea = (convertToFeet(document.getElementById('stairRiseFt').value, document.getElementById('stairRiseInch').value) * steps * 
+                         convertToFeet(document.getElementById('stairWidthFt').value, document.getElementById('stairWidthInch').value)) +
+                        (convertToFeet(document.getElementById('stairTreadFt').value, document.getElementById('stairTreadInch').value) * steps * 
+                         convertToFeet(document.getElementById('stairWidthFt').value, document.getElementById('stairWidthInch').value)); 
+          break;
+        case 'custom':
+          formworkArea = parseFloat(document.getElementById('customAreaFt').value) || 0; 
+          break;
+      }
+      
+      const totalArea = formworkArea * (1 + wastage / 100);
+      const sheetsNeeded = Math.ceil(totalArea / (plywoodSize[0] * plywoodSize[1]));
+      const totalCost = materialRate * totalArea;
+      
+      let html = `<h5>Results</h5>
+                  <p>Formwork Area: ${formworkArea.toFixed(2)} sqft</p>
+                  <p>Total Area (with wastage): ${totalArea.toFixed(2)} sqft</p>
+                  <p>Plywood Sheets Needed: ${sheetsNeeded}</p>`;
+      
+      if(materialRate > 0) {
+        html += `<p>Estimated Material Cost: ৳${totalCost.toFixed(2)}</p>`;
+      }
+      
+      document.getElementById('result').innerHTML = html;
+    }
+
+    function saveResults() {
+      if(!document.getElementById('result').innerHTML) { 
+        alert("Please calculate first"); 
+        return; 
+      }
+      
+      const blob = new Blob([document.getElementById('result').innerHTML], {type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); 
+      a.href = url; 
+      a.download = 'formwork_results.html';
+      document.body.appendChild(a); 
+      a.click(); 
+      document.body.removeChild(a); 
+      URL.revokeObjectURL(url);
+    }
+
+    function resetCalculator() {
+      document.getElementById('wastage').value = 5;
+      document.getElementById('plywoodSize').value = '4x8';
+      document.getElementById('materialRate').value = '';
+      document.getElementById('result').innerHTML = '';
+      showStructureInputs();
+    }
+
+    // Initialize calculator
+    showStructureInputs();
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('nav a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        
+        window.scrollTo({
+          top: targetSection.offsetTop - 80,
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Back to top button
+    const backToTopButton = document.getElementById('backToTop');
+    
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        backToTopButton.classList.add('active');
+      } else {
+        backToTopButton.classList.remove('active');
+      }
+    });
+    
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Form submission handler
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Thank you for your message! We will get back to you soon.');
+      this.reset();
+    });
+
+    // Active navigation highlighting
+    window.addEventListener('scroll', () => {
+      let current = '';
+      const sections = document.querySelectorAll('section');
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        
+        if (pageYOffset >= sectionTop - 100) {
+          current = section.getAttribute('id');
+        }
+      });
+      
+      document.querySelectorAll('nav a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>
