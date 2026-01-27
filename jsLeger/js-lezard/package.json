@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "JS Accounting",
   "main": "client/index.js",
   "version": "1.0.0",
   "scripts": {
@@ -59,6 +59,11 @@
     "zod": "^3.24.2",
     "zod-validation-error": "^3.4.0"
   },
+  
+  "overrides": {
+    "esbuild": "0.27.2"
+  }
+  
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "24.10.0",
