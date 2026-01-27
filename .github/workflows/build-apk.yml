@@ -19,26 +19,25 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Use an LTS version like 18 or 20
+          node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'jsLeger/js-lezard/package-lock.json' # Point to the lock file in your subdirectory
+          cache-dependency-path: 'jsLeger/js-lezard/package-lock.json'
 
-      # 4. Install Expo and EAS CLI, authenticate
+      # 4. Install Expo and EAS CLI, authenticate (CORRECTED)
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-          project-path: jsLeger/js-lezard # 👈 Important: Tell the action where your project is
+          expo-token: ${{ secrets.EXPO_TOKEN }} # Correct parameter name
 
       # 5. Install dependencies (from the subdirectory)
       - name: Install dependencies
         run: npm ci
-        working-directory: ./jsLeger/js-lezard # 👈 Runs npm in your project folder
+        working-directory: ./jsLeger/js-lezard
 
       # 6. Build the APK using EAS
       - name: Build APK on EAS
         run: eas build --platform android --non-interactive --no-wait
-        working-directory: ./jsLeger/js-lezard # 👈 Runs eas in your project folder
+        working-directory: ./jsLeger/js-lezard
         env:
           EAS_SKIP_AUTO_FINGERPRINT: 1 # Optional: includes the workaround for your previous error
