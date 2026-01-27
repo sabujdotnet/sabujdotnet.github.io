@@ -1,0 +1,5 @@
+- name: Build APK on EAS
+  env:
+    EAS_SKIP_AUTO_FINGERPRINT: 1  # concurrency:
+      
+  run: eas build --platform android --non-interactive --no-wait
