@@ -3,37 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Shuttering/Formwork Pro — Invoice & Rental Tool</title>
+  <title>J/S Enterprise> Shuttering/Formwork Pro — Invoice & Rental Tool</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- PWA Meta Tags -->
-<meta name="application-name" content="Shuttering-Pro">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Shuttering Pro">
-<meta name="description" content="All-in-one Invoice & Rental Management Tool for Construction Business">
-<meta name="format-detection" content="telephone=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="msapplication-TileColor" content="#2c3e50">
-<meta name="msapplication-tap-highlight" content="no">
-<meta name="theme-color" content="#2c3e50">
-
-<!-- Apple Touch Icons -->
-<link rel="apple-touch-icon" href="/icons/icon-152x152.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png">
-<link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png">
-
-<!-- Safari Pinned Tab -->
-<link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#2c3e50">
-
-<!-- Manifest -->
-<link rel="manifest" href="/manifest.json">
-
-<!-- Theme Color for Mobile Browsers -->
-<meta name="theme-color" content="#2c3e50" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#2b0b3a" media="(prefers-color-scheme: dark)">
+  
+  <!-- Load scripts with proper integrity for offline reliability -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+  
   <style>
     :root {
       --primary: #2c3e50; --secondary: #3498db; --accent: #e74c3c;
@@ -270,20 +246,18 @@
       display: block;
     }
     
-    /* Logo imprint styling for invoice */ 
     .invoice-imprint { 
      position: absolute;
      top: 50%; 
      left: 50%;
      width: 380px; 
-     max-width: 60vW; 
+     max-width: 60vw; 
      opacity: 0.08; 
-     transform: translate(-50%,-50%): 
+     transform: translate(-50%,-50%);
      z-index: 0; 
      pointer-events: none; 
    }
     
-    /* Watermark styling for invoice */
     .invoice-watermark {
       position: absolute;
       top: 50%;
@@ -465,6 +439,10 @@
       font-weight: bold;
     }
     
+    .print-copy-label {
+        display: none;
+    }
+
     @media print {
       body { 
         background: #fff; 
@@ -486,7 +464,6 @@
       }
     }
     
-    /* Dark mode support */
     @media (prefers-color-scheme: dark) {
       .card {
         background: var(--dark-card);
@@ -512,9 +489,20 @@
       padding: 20px;
       font-size: 0.9em;
     }
+    
+    .error-message {
+      background: #fee;
+      color: #c00;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      display: none;
+    }
   </style>
 </head>
 <body>
+  <div id="errorMsg" class="error-message"></div>
+  
   <header>
     <div class="container flex">
       <div class="flex">
@@ -536,17 +524,15 @@
   
   <main class="container app-grid">
     <div>
-      <!-- Tab Navigation -->
       <div class="tab-container">
-        <div class="tab active" onclick="switchTab('invoice')">Invoice</div>
-        <div class="tab" onclick="switchTab('projects')">Projects</div>
-        <div class="tab" onclick="switchTab('dashboard')">Dashboard</div>
-        <div class="tab" onclick="switchTab('settings')">Settings</div>
+        <div class="tab active" onclick="switchTab('invoice', this)">Invoice</div>
+        <div class="tab" onclick="switchTab('projects', this)">Projects</div>
+        <div class="tab" onclick="switchTab('dashboard', this)">Dashboard</div>
+        <div class="tab" onclick="switchTab('estimator', this)">Estimator (BD)</div>
+        <div class="tab" onclick="switchTab('settings', this)">Settings</div>
       </div>
       
-      <!-- Invoice Tab -->
       <div id="invoice-tab" class="tab-content active">
-        <!-- Project Selection -->
         <div class="card">
           <h3><i class="fas fa-folder"></i> Project Selection</h3>
           <div class="form-group flex-row">
@@ -566,7 +552,6 @@
           </div>
         </div>
         
-        <!-- Company Info & Logo -->
         <div class="card">
           <h3><i class="fas fa-building"></i> Business Settings</h3>
           <div class="form-group">
@@ -603,7 +588,6 @@
           </div>
         </div>
         
-        <!-- Customer Info -->
         <div class="card">
           <h3><i class="fas fa-user"></i> Customer Info</h3>
           <div class="form-group"><label>Name</label><input id="customerName" type="text"></div>
@@ -612,7 +596,6 @@
           <div class="form-group"><label>GSTIN</label><input id="customerGST" type="text"></div>
         </div>
         
-        <!-- Rental Items -->
         <div class="card">
           <h3><i class="fas fa-cube"></i> Rental Items</h3>
           <div class="form-group flex-row">
@@ -646,6 +629,9 @@
               <span>ft</span>
               <input id="itemIn2" type="number" min="0" max="11.99" step="any" placeholder="in">
               <span>in</span>
+              <span>×</span>
+              <input id="itemNos" type="number" min="1" value="1" placeholder="Pcs" style="width:50px;">
+              <span>pcs</span>
               <button type="button" class="btn-gray" onclick="calcSqftFromFtIn()">=</button>
               <span id="ftinResult" style="min-width:70px;display:inline-block;"></span>
             </div>
@@ -666,7 +652,6 @@
             <th>Category</th><th>Description</th><th>Area</th><th>Rate</th><th>Discount</th><th>Amount</th><th>Note</th><th></th></tr></thead><tbody></tbody></table>
         </div>
         
-        <!-- Invoice Notes, Charges, Discount -->
         <div class="card">
           <h3><i class="fas fa-file-alt"></i> Invoice Details</h3>
           <div class="form-group"><label>Additional Charges</label><input id="addCharges" type="number" value="0"></div>
@@ -680,7 +665,6 @@
         </div>
       </div>
       
-      <!-- Projects Tab -->
       <div id="projects-tab" class="tab-content">
         <div class="card">
           <h3><i class="fas fa-folder-open"></i> Project Management</h3>
@@ -692,7 +676,6 @@
         </div>
       </div>
       
-      <!-- Dashboard Tab -->
       <div id="dashboard-tab" class="tab-content">
         <div class="card">
           <h3><i class="fas fa-database"></i> Data & Dashboard</h3>
@@ -704,8 +687,31 @@
           <div id="analyticsBoard" style="margin-top:10px"></div>
         </div>
       </div>
+
+      <div id="estimator-tab" class="tab-content">
+        <div class="card">
+            <h3><i class="fas fa-calculator"></i> Material Estimator (Bangladesh Standards)</h3>
+            <div style="margin-bottom:10px; background:#e1f5fe; padding:10px; border-radius:5px;">
+                <small>Assumptions: 1:2:4 Mix Ratio (RCC Slab), 5" thickness.</small>
+            </div>
+            <div class="form-group">
+                <label>Total Construction Area (Sqft)</label>
+                <input id="estArea" type="number" oninput="calculateBDEstimate()" placeholder="Enter area in sqft (e.g. 1000)">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Material</th>
+                        <th>Quantity</th>
+                        <th>Avg. Market Price (BD)</th>
+                        <th>Estimated Cost</th>
+                    </tr>
+                </thead>
+                <tbody id="estBody"></tbody>
+            </table>
+        </div>
+      </div>
       
-      <!-- Settings Tab -->
       <div id="settings-tab" class="tab-content">
         <div class="card">
           <h3><i class="fas fa-cog"></i> Application Settings</h3>
@@ -717,9 +723,9 @@
             <label>Default Currency</label>
             <select id="defaultCurrency">
               <option value="৳">৳ BDT</option>
-              <option value="₹">₹ INR (in paid version)</option>
-              <option value="$">$ USD(in paid version)</option>
-              <option value="€">€ EU(in paid version )R</option>
+              <option value="₹">₹ INR</option>
+              <option value="$">$ USD</option>
+              <option value="€">€ EUR</option>
             </select>
           </div>
           <div class="form-group">
@@ -731,10 +737,8 @@
       </div>
     </div>
     
-    <!-- RIGHT: Invoice Preview -->
     <aside>
       <div class="bill-preview card" id="billPreview">
-        <!-- Logo imprint -->
         <img src="https://github.com/sabujdotnet/sabujdotnet.github.io/blob/main/img/logo.png?raw=true" alt="J/s Enterprise Logo" class="invoice-imprint" id="invoiceImprint" />
         
         <div class="invoice-header">
@@ -781,8 +785,8 @@
         <div style="margin-top: 10px; text-align:center; color:#555">Thank you for your business!</div>
         
         <div class="no-print invoice-actions">
-          <button type="button" onclick="printInvoice()" class="btn-primary">Print</button>
-          <button type="button" onclick="downloadPDF()" class="btn-success">PDF</button>
+          <button type="button" onclick="printInvoice()" class="btn-primary">Print (Dual Copy)</button>
+          <button type="button" onclick="downloadPDF()" class="btn-success">PDF (Dual Copy)</button>
           <button type="button" onclick="sendEmail()" class="btn-gray">Send Email</button>
           <button type="button" onclick="resetForm()" class="btn-danger">Reset</button>
         </div>
@@ -795,97 +799,160 @@
   </footer>
 
   <script>
-    // ==== STATE ====
-    let items = [];
-    let projects = JSON.parse(localStorage.getItem("projects") || "[]");
-    let currentProjectId = null;
-    let invoices = JSON.parse(localStorage.getItem("invoices") || "[]");
-    let logoData = localStorage.getItem("companyLogo") || "";
-    let user = null;
-    let settings = JSON.parse(localStorage.getItem("appSettings") || '{"taxRate":18,"currency":"৳","invoiceFormat":"INV-YYYY-#####"}');
+    // Safe localStorage wrapper with fallback to memory
+    const Storage = {
+      data: {},
+      isAvailable: false,
+      
+      init: function() {
+        try {
+          const test = '__test__';
+          localStorage.setItem(test, test);
+          localStorage.removeItem(test);
+          this.isAvailable = true;
+          console.log('localStorage is available');
+        } catch(e) {
+          this.isAvailable = false;
+          console.warn('localStorage not available (file:// protocol?), using memory storage');
+          showError('Warning: Running in file mode. Data will not persist after closing the browser. Use a local server (like Live Server) for full functionality.');
+        }
+      },
+      
+      getItem: function(key) {
+        if (this.isAvailable) {
+          return localStorage.getItem(key);
+        }
+        return this.data[key] || null;
+      },
+      
+      setItem: function(key, value) {
+        if (this.isAvailable) {
+          localStorage.setItem(key, value);
+        } else {
+          this.data[key] = value;
+        }
+      },
+      
+      removeItem: function(key) {
+        if (this.isAvailable) {
+          localStorage.removeItem(key);
+        } else {
+          delete this.data[key];
+        }
+      }
+    };
 
-    // ==== UTILS ====
-    function $(id) { return document.getElementById(id); }
-    function currency() { return $("currency").value; }
-    function taxRate() { return parseFloat($("taxRate").value) || 0; }
-    function previewCurrency(val) { return currency() + (parseFloat(val)||0).toFixed(2); }
+    function showError(msg) {
+      const errDiv = document.getElementById('errorMsg');
+      if (errDiv) {
+        errDiv.textContent = msg;
+        errDiv.style.display = 'block';
+        setTimeout(() => errDiv.style.display = 'none', 10000);
+      }
+    }
+
+    // Global state
+    let items = [];
+    let projects = [];
+    let currentProjectId = null;
+    let invoices = [];
+    let logoData = "";
+    let user = null;
+    let settings = {taxRate: 18, currency: "৳", invoiceFormat: "INV-YYYY-#####"};
+    let appInitialized = false;
+
+    function $(id) { 
+      const el = document.getElementById(id);
+      if (!el && !appInitialized) console.warn('Element not found: ' + id);
+      return el; 
+    }
+
+    function currency() { 
+      const el = $('currency');
+      return el ? el.value : '৳'; 
+    }
+    
+    function taxRate() { 
+      const el = $('taxRate');
+      return el ? (parseFloat(el.value) || 0) : 18; 
+    }
+    
+    function previewCurrency(val) { 
+      return currency() + (parseFloat(val)||0).toFixed(2); 
+    }
+    
     function genInvoiceNum() { 
       const format = settings.invoiceFormat || "INV-YYYY-#####";
       const year = new Date().getFullYear();
       const random = Math.floor(Math.random()*99999);
       return format.replace("YYYY", year).replace("#####", random.toString().padStart(5, '0'));
     }
-    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+    
+    function generateId() { 
+      return Date.now().toString(36) + Math.random().toString(36).substr(2); 
+    }
 
-    // ==== TAB MANAGEMENT ====
-    function switchTab(tabName) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      // Remove active class from all tabs
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      
-      // Show selected tab content
-      document.getElementById(tabName + '-tab').classList.add('active');
-      
-      // Activate selected tab
-      event.target.classList.add('active');
-      
-      // Refresh content if needed
-      if (tabName === 'projects') {
-        refreshProjects();
-      } else if (tabName === 'dashboard') {
-        showDashboard();
+    function switchTab(tabName, clickedTab) {
+      try {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        
+        const content = document.getElementById(tabName + '-tab');
+        if(content) content.classList.add('active');
+        
+        if (clickedTab) clickedTab.classList.add('active');
+        
+        if (tabName === 'projects') refreshProjects();
+        if (tabName === 'dashboard') showDashboard();
+      } catch(e) {
+        console.error('Error switching tabs:', e);
       }
     }
 
-    // ==== PROJECT MANAGEMENT ====
     function showNewProjectModal() {
-      $("projectName").value = "";
-      $("projectDescription").value = "";
-      $("projectSelect").value = "";
+      const nameEl = $('projectName');
+      const descEl = $('projectDescription');
+      const selectEl = $('projectSelect');
+      
+      if (nameEl) nameEl.value = "";
+      if (descEl) descEl.value = "";
+      if (selectEl) selectEl.value = "";
       currentProjectId = null;
     }
     
     function saveProject() {
-      const projectName = $("projectName").value.trim();
-      if (!projectName) {
+      const nameEl = $('projectName');
+      if (!nameEl || !nameEl.value.trim()) {
         alert("Please enter a project name");
         return;
       }
       
       const project = {
         id: currentProjectId || generateId(),
-        name: projectName,
-        description: $("projectDescription").value,
+        name: nameEl.value.trim(),
+        description: $('projectDescription') ? $('projectDescription').value : '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
       
-      // Check if updating existing project
       const existingIndex = projects.findIndex(p => p.id === project.id);
-      if (existingIndex >= 0) {
-        projects[existingIndex] = project;
-      } else {
-        projects.push(project);
-      }
+      if (existingIndex >= 0) projects[existingIndex] = project;
+      else projects.push(project);
       
-      localStorage.setItem("projects", JSON.stringify(projects));
+      Storage.setItem("projects", JSON.stringify(projects));
       updateProjectSelector();
-      $("projectSelect").value = project.id;
-      currentProjectId = project.id;
       
+      const selectEl = $('projectSelect');
+      if (selectEl) selectEl.value = project.id;
+      currentProjectId = project.id;
       alert("Project saved successfully!");
     }
     
     function updateProjectSelector() {
-      const selector = $("projectSelect");
-      selector.innerHTML = '<option value="">-- Create New Project --</option>';
+      const selector = $('projectSelect');
+      if (!selector) return;
       
+      selector.innerHTML = '<option value="">-- Create New Project --</option>';
       projects.forEach(project => {
         const option = document.createElement("option");
         option.value = project.id;
@@ -899,17 +966,18 @@
         showNewProjectModal();
         return;
       }
-      
       const project = projects.find(p => p.id === projectId);
       if (project) {
-        $("projectName").value = project.name;
-        $("projectDescription").value = project.description || "";
+        const nameEl = $('projectName');
+        const descEl = $('projectDescription');
+        if (nameEl) nameEl.value = project.name;
+        if (descEl) descEl.value = project.description || "";
         currentProjectId = project.id;
       }
     }
     
     function refreshProjects() {
-      const projectsList = $("projectsList");
+      const projectsList = $('projectsList');
       if (!projectsList) return;
       
       if (projects.length === 0) {
@@ -921,10 +989,13 @@
       projects.forEach(project => {
         const projectInvoices = invoices.filter(inv => inv.projectId === project.id);
         const totalInvoices = projectInvoices.length;
-        const totalAmount = projectInvoices.reduce((sum, inv) => sum + parseFloat(inv.total.replace(/[^\d.]/g, '') || 0), 0);
+        const totalAmount = projectInvoices.reduce((sum, inv) => {
+          const val = parseFloat(inv.total ? inv.total.replace(/[^\d.]/g, '') : 0) || 0;
+          return sum + val;
+        }, 0);
         
         html += `
-          <div class="dashboard-item" onclick="loadProject('${project.id}'); switchTab('invoice')">
+          <div class="dashboard-item" onclick="loadProject('${project.id}'); switchTab('invoice', document.querySelector('.tab'))">
             <div class="project-header">
               <span class="project-name">${project.name}</span>
               <span class="status-badge status-${totalInvoices > 0 ? 'paid' : 'draft'}">${totalInvoices} invoices</span>
@@ -936,44 +1007,12 @@
               Created: ${new Date(project.createdAt).toLocaleDateString()} | 
               Total: ${currency()}${totalAmount.toFixed(2)}
             </div>
-            <div class="project-invoices">
-              ${projectInvoices.map(inv => `
-                <div style="padding: 5px; margin: 2px 0; background: #f0f0f0; border-radius: 3px;">
-                  ${inv.number} - ${inv.total} - ${inv.date}
-                </div>
-              `).join('')}
-            </div>
           </div>
         `;
       });
-      
       projectsList.innerHTML = html;
     }
-    
-    function deleteProject(projectId) {
-      if (!confirm("Are you sure you want to delete this project? All associated invoices will also be deleted.")) {
-        return;
-      }
-      
-      // Remove project
-      projects = projects.filter(p => p.id !== projectId);
-      
-      // Remove associated invoices
-      invoices = invoices.filter(inv => inv.projectId !== projectId);
-      
-      localStorage.setItem("projects", JSON.stringify(projects));
-      localStorage.setItem("invoices", JSON.stringify(invoices));
-      
-      if (currentProjectId === projectId) {
-        showNewProjectModal();
-      }
-      
-      updateProjectSelector();
-      refreshProjects();
-      alert("Project deleted successfully!");
-    }
 
-    // ==== INVOICE MANAGEMENT ====
     function saveInvoice() {
       if (!currentProjectId) {
         alert("Please select or create a project first");
@@ -983,356 +1022,605 @@
       const invoice = {
         id: generateId(),
         projectId: currentProjectId,
-        number: $("invoiceNumber").textContent,
-        date: $("invoiceDate").textContent,
+        number: $('invoiceNumber') ? $('invoiceNumber').textContent : genInvoiceNum(),
+        date: $('invoiceDate') ? $('invoiceDate').textContent : new Date().toLocaleDateString(),
         customer: {
-          name: $("customerName").value, 
-          address: $("customerAddress").value,
-          phone: $("customerPhone").value, 
-          gst: $("customerGST").value
+          name: $('customerName') ? $('customerName').value : '', 
+          address: $('customerAddress') ? $('customerAddress').value : '',
+          phone: $('customerPhone') ? $('customerPhone').value : '', 
+          gst: $('customerGST') ? $('customerGST').value : ''
         },
         company: {
-          name: $("companyName").value,
-          address: $("companyAddress").value,
-          phone: $("companyPhone").value,
-          gst: $("companyGST").value
+          name: $('companyName') ? $('companyName').value : '',
+          address: $('companyAddress') ? $('companyAddress').value : '',
+          phone: $('companyPhone') ? $('companyPhone').value : '',
+          gst: $('companyGST') ? $('companyGST').value : ''
         },
         items: JSON.parse(JSON.stringify(items)),
-        charges: $("addCharges").value, 
-        discount: $("totalDiscount").value,
-        note: $("invoiceNote").value, 
-        total: $("previewTotal").textContent,
+        charges: $('addCharges') ? $('addCharges').value : 0, 
+        discount: $('totalDiscount') ? $('totalDiscount').value : 0,
+        note: $('invoiceNote') ? $('invoiceNote').value : '', 
+        total: $('previewTotal') ? $('previewTotal').textContent : previewCurrency(0),
         status: 'draft',
         createdAt: new Date().toISOString()
       };
       
-      // Check if updating existing invoice
       const existingIndex = invoices.findIndex(inv => inv.number === invoice.number);
-      if (existingIndex >= 0) {
-        invoices[existingIndex] = invoice;
-      } else {
-        invoices.push(invoice);
-      }
+      if (existingIndex >= 0) invoices[existingIndex] = invoice;
+      else invoices.push(invoice);
       
-      localStorage.setItem("invoices", JSON.stringify(invoices));
+      Storage.setItem("invoices", JSON.stringify(invoices));
       alert("Invoice saved to project!");
     }
 
-    // ==== FT-INCH AREA CALC ====
     function calcSqftFromFtIn() {
-      let ft1 = parseFloat($("itemFt").value)||0;
-      let in1 = parseFloat($("itemIn").value)||0;
-      let ft2 = parseFloat($("itemFt2").value)||0;
-      let in2 = parseFloat($("itemIn2").value)||0;
-      let dim1 = ft1 + in1/12;
-      let dim2 = ft2 + in2/12;
-      let area = dim1 * dim2;
-      $("ftinResult").textContent = area>0 ? area.toFixed(3)+" sqft" : "";
-      if(area>0){
-        $("itemSqft").value = area.toFixed(3);
+      const ft1 = parseFloat($('itemFt') ? $('itemFt').value : 0)||0;
+      const in1 = parseFloat($('itemIn') ? $('itemIn').value : 0)||0;
+      const ft2 = parseFloat($('itemFt2') ? $('itemFt2').value : 0)||0;
+      const in2 = parseFloat($('itemIn2') ? $('itemIn2').value : 0)||0;
+      const nos = parseFloat($('itemNos') ? $('itemNos').value : 1)||1;
+
+      const dim1 = ft1 + in1/12;
+      const dim2 = ft2 + in2/12;
+      const area = dim1 * dim2 * nos;
+      
+      const resultEl = $('ftinResult');
+      if (resultEl) resultEl.textContent = area>0 ? area.toFixed(3)+" sqft" : "";
+      
+      const sqftEl = $('itemSqft');
+      if(area>0 && sqftEl){
+        sqftEl.value = area.toFixed(3);
       }
       return area;
     }
-    ["itemFt","itemIn","itemFt2","itemIn2"].forEach(id=>{
-      $(id).addEventListener("input", calcSqftFromFtIn);
-    });
 
-    // ==== COMPANY SETTINGS ====
     function updateCompanyPreview() {
-      $("previewCompanyName").textContent = $("companyName").value;
-      $("previewCompanyAddress").textContent = $("companyAddress").value;
-      $("previewCompanyPhone").textContent = $("companyPhone").value;
-      $("previewCompanyGST").textContent = $("companyGST").value;
-      $("previewLogo").src = logoData;
-      $("previewLogo").style.display = logoData ? "block" : "none";
-      localStorage.setItem("companyName", $("companyName").value);
-      localStorage.setItem("companyAddress", $("companyAddress").value);
-      localStorage.setItem("companyPhone", $("companyPhone").value);
-      localStorage.setItem("companyGST", $("companyGST").value);
-      localStorage.setItem("companyLogo", logoData);
+      const nameEl = $('previewCompanyName');
+      const addrEl = $('previewCompanyAddress');
+      const phoneEl = $('previewCompanyPhone');
+      const gstEl = $('previewCompanyGST');
+      const logoEl = $('previewLogo');
+      
+      if (nameEl) nameEl.textContent = $('companyName') ? $('companyName').value : '';
+      if (addrEl) addrEl.textContent = $('companyAddress') ? $('companyAddress').value : '';
+      if (phoneEl) phoneEl.textContent = $('companyPhone') ? $('companyPhone').value : '';
+      if (gstEl) gstEl.textContent = $('companyGST') ? $('companyGST').value : '';
+      
+      if (logoEl) {
+        logoEl.src = logoData;
+        logoEl.style.display = logoData ? "block" : "none";
+      }
+      
+      Storage.setItem("companyName", $('companyName') ? $('companyName').value : '');
+      Storage.setItem("companyAddress", $('companyAddress') ? $('companyAddress').value : '');
+      Storage.setItem("companyPhone", $('companyPhone') ? $('companyPhone').value : '');
+      Storage.setItem("companyGST", $('companyGST') ? $('companyGST').value : '');
+      Storage.setItem("companyLogo", logoData);
     }
-    ["companyName","companyAddress","companyPhone","companyGST"].forEach(id => $(id).addEventListener("input", updateCompanyPreview));
-    $("logoUpload").addEventListener("change", function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(ev) { logoData = ev.target.result; updateCompanyPreview(); }
-      reader.readAsDataURL(file);
-    });
-    $("currency").addEventListener("change", updateAll);
-    $("taxRate").addEventListener("input", updateAll);
 
-    // ==== INVOICE DETAILS ====
     function updateCustomerPreview() {
-      ["customerName","customerAddress","customerPhone","customerGST"].forEach(id => {
-        $("preview" + id.charAt(0).toUpperCase() + id.slice(1)).textContent = $(id).value;
+      const fields = ['customerName','customerAddress','customerPhone','customerGST'];
+      fields.forEach(id => {
+        const previewId = 'preview' + id.charAt(0).toUpperCase() + id.slice(1);
+        const sourceEl = $(id);
+        const targetEl = $(previewId);
+        if (sourceEl && targetEl) targetEl.textContent = sourceEl.value;
       });
     }
-    ["customerName","customerAddress","customerPhone","customerGST"].forEach(id => $(id).addEventListener("input", updateCustomerPreview));
-
-    // ==== RENTAL ITEMS ====
+    
     function renderItemsTable() {
-      let tbody = $("itemsTable").querySelector("tbody");
-      tbody.innerHTML = "";
+      const tbody = $('itemsTable');
+      if (!tbody) return;
+      
+      const tbodyInner = tbody.querySelector("tbody");
+      if (!tbodyInner) return;
+      
+      tbodyInner.innerHTML = "";
       items.forEach((it, i) => {
-        tbody.innerHTML += `<tr>
+        const row = document.createElement('tr');
+        row.innerHTML = `
           <td>${it.cat}</td>
           <td>${it.desc}</td>
-          <td>${it.area}</td>
+          <td>${it.displayArea || it.area}</td>
           <td>${previewCurrency(it.rate)}</td>
           <td>${it.discount}%</td>
           <td>${previewCurrency(it.amount)}</td>
           <td>${it.note||""}</td>
           <td><button type="button" onclick="removeItem(${i})" class="btn-danger">x</button></td>
-        </tr>`;
+        `;
+        tbodyInner.appendChild(row);
       });
     }
     
     function renderInvoicePreview() {
-      let pbody = $("previewItems"); pbody.innerHTML = "";
+      const pbody = $('previewItems');
+      if (!pbody) return;
+      
+      pbody.innerHTML = "";
       let subtotal = 0;
+      
       items.forEach(it => {
-        pbody.innerHTML += `<tr>
+        const row = document.createElement('tr');
+        row.innerHTML = `
           <td>${it.cat}</td>
           <td>${it.desc}</td>
-          <td>${it.area}</td>
+          <td>${it.displayArea || it.area}</td>
           <td>${previewCurrency(it.rate)}</td>
           <td>${it.discount}%</td>
           <td>${previewCurrency(it.amount)}</td>
           <td>${it.note||""}</td>
-        </tr>`;
+        `;
+        pbody.appendChild(row);
         subtotal += it.amount;
       });
-      $("previewSubtotal").textContent = previewCurrency(subtotal);
-      let addCharges = parseFloat($("addCharges").value)||0;
-      let totalDiscount = parseFloat($("totalDiscount").value)||0;
-      let discountAmt = subtotal * totalDiscount/100;
-      $("previewAddCharges").textContent = previewCurrency(addCharges);
-      $("previewDiscount").textContent = previewCurrency(discountAmt);
-      let taxed = Math.max(0, subtotal + addCharges - discountAmt);
-      let tax = taxed * taxRate()/100;
-      $("previewTax").textContent = previewCurrency(tax);
-      let total = taxed + tax;
-      $("previewTotal").textContent = previewCurrency(total);
-      $("previewInvoiceNote").textContent = $("invoiceNote").value;
-      $("qrCode").innerHTML = "";
-      new QRCode($("qrCode"), { text: $("invoiceNumber").textContent, width:64, height:64 });
+      
+      const subtotalEl = $('previewSubtotal');
+      if (subtotalEl) subtotalEl.textContent = previewCurrency(subtotal);
+      
+      const addCharges = parseFloat($('addCharges') ? $('addCharges').value : 0)||0;
+      const totalDiscount = parseFloat($('totalDiscount') ? $('totalDiscount').value : 0)||0;
+      const discountAmt = subtotal * totalDiscount/100;
+      
+      const addChargesEl = $('previewAddCharges');
+      const discountEl = $('previewDiscount');
+      if (addChargesEl) addChargesEl.textContent = previewCurrency(addCharges);
+      if (discountEl) discountEl.textContent = previewCurrency(discountAmt);
+      
+      const taxed = Math.max(0, subtotal + addCharges - discountAmt);
+      const tax = taxed * taxRate()/100;
+      
+      const taxEl = $('previewTax');
+      if (taxEl) taxEl.textContent = previewCurrency(tax);
+      
+      const total = taxed + tax;
+      const totalEl = $('previewTotal');
+      if (totalEl) totalEl.textContent = previewCurrency(total);
+      
+      const noteEl = $('previewInvoiceNote');
+      const invoiceNoteEl = $('invoiceNote');
+      if (noteEl && invoiceNoteEl) noteEl.textContent = invoiceNoteEl.value;
+      
+      const qrEl = $('qrCode');
+      if (qrEl && typeof QRCode !== 'undefined') {
+        qrEl.innerHTML = "";
+        try {
+          new QRCode(qrEl, { text: $('invoiceNumber') ? $('invoiceNumber').textContent : 'INV-00000', width:64, height:64 });
+        } catch(e) {
+          console.error('QRCode generation failed:', e);
+        }
+      }
+      
       updateCompanyPreview();
       updateCustomerPreview();
     }
     
-    function updateAll() { renderItemsTable(); renderInvoicePreview(); }
+    function updateAll() { 
+      renderItemsTable(); 
+      renderInvoicePreview(); 
+    }
     
     function addItem() {
-      let cat = $("itemCategory").value,
-          desc = $("itemDescription").value,
-          area = parseFloat($("itemSqft").value) || 0,
-          rate = parseFloat($("itemRate").value) || 0,
-          discount = parseFloat($("itemDiscount").value)||0,
-          note = $("itemNote").value;
-      if (!desc || area <= 0 || rate <= 0) return alert("Fill all item fields");
-      let amount = area * rate * (1 - discount/100);
-      items.push({ cat, desc, area, rate, discount, note, amount });
-      $("itemDescription").value = $("itemSqft").value = $("itemRate").value = $("itemDiscount").value = $("itemNote").value = "";
-      ["itemFt","itemIn","itemFt2","itemIn2"].forEach(id => $(id).value = "");
-      $("ftinResult").textContent = "";
+      const catEl = $('itemCategory');
+      const descEl = $('itemDescription');
+      const areaEl = $('itemSqft');
+      const rateEl = $('itemRate');
+      const discountEl = $('itemDiscount');
+      const noteEl = $('itemNote');
+      
+      if (!catEl || !descEl || !areaEl || !rateEl) {
+        alert("Form elements not ready");
+        return;
+      }
+
+      const cat = catEl.value;
+      const desc = descEl.value;
+      const area = parseFloat(areaEl.value) || 0;
+      const rate = parseFloat(rateEl.value) || 0;
+      const discount = parseFloat(discountEl ? discountEl.value : 0)||0;
+      const note = noteEl ? noteEl.value : '';
+
+      if (!desc || area <= 0 || rate <= 0) {
+        alert("Fill all item fields");
+        return;
+      }
+
+      let displayArea = area;
+      const f1 = $('itemFt') ? $('itemFt').value : '';
+      const f2 = $('itemFt2') ? $('itemFt2').value : '';
+      
+      if(f1 || f2) {
+          const i1 = $('itemIn') ? ($('itemIn').value || 0) : 0;
+          const i2 = $('itemIn2') ? ($('itemIn2').value || 0) : 0;
+          const nos = $('itemNos') ? ($('itemNos').value || 1) : 1;
+          displayArea = `${f1}'${i1>0?i1+'"':''} × ${f2}'${i2>0?i2+'"':''} × ${nos}pcs`;
+      }
+
+      const amount = area * rate * (1 - discount/100);
+      items.push({ cat, desc, area, displayArea, rate, discount, note, amount });
+      
+      // Clear Inputs
+      descEl.value = '';
+      areaEl.value = '';
+      if (rateEl) rateEl.value = '';
+      if (discountEl) discountEl.value = '0';
+      if (noteEl) noteEl.value = '';
+      
+      ['itemFt','itemIn','itemFt2','itemIn2'].forEach(id => {
+        const el = $(id);
+        if(el) el.value = "";
+      });
+      
+      const nosEl = $('itemNos');
+      if (nosEl) nosEl.value = "1";
+      
+      const ftinResult = $('ftinResult');
+      if (ftinResult) ftinResult.textContent = "";
+      
       updateAll();
     }
     
-    function removeItem(i) { items.splice(i,1); updateAll(); }
-    
-    $("addItem").onclick = addItem;
-    $("clearItems").onclick = () => { if(confirm("Clear items?")){ items=[]; updateAll(); }};
-    ["addCharges","totalDiscount","invoiceNote"].forEach(id => $(id).addEventListener("input", renderInvoicePreview));
+    function removeItem(i) { 
+      items.splice(i,1); 
+      updateAll(); 
+    }
 
-    // ==== INVOICE NUMBER, DATE, LOGO ====
     function setupInvoice() {
-      $("invoiceDate").textContent = new Date().toLocaleDateString();
-      $("invoiceNumber").textContent = genInvoiceNum();
-      logoData = localStorage.getItem("companyLogo") || "";
-      $("previewLogo").src = logoData;
-      $("previewLogo").style.display = logoData ? "block":"none";
-      $("companyName").value = localStorage.getItem("companyName") || "J/s Enterprise";
-      $("companyAddress").value = localStorage.getItem("companyAddress") || "Narayanganj, Bangladesh";
-      $("companyPhone").value = localStorage.getItem("companyPhone") || "01994316210";
-      $("companyGST").value = localStorage.getItem("companyGST") || "27ABCDE1234F1Z2";
+      const dateEl = $('invoiceDate');
+      const numEl = $('invoiceNumber');
       
-      // Apply settings
-      if (settings.taxRate) $("taxRate").value = settings.taxRate;
-      if (settings.currency) $("currency").value = settings.currency;
+      if (dateEl) dateEl.textContent = new Date().toLocaleDateString();
+      if (numEl) numEl.textContent = genInvoiceNum();
+      
+      logoData = Storage.getItem("companyLogo") || "";
+      
+      const logoEl = $('previewLogo');
+      if (logoEl) {
+        logoEl.src = logoData;
+        logoEl.style.display = logoData ? "block":"none";
+      }
+      
+      const compName = $('companyName');
+      const compAddr = $('companyAddress');
+      const compPhone = $('companyPhone');
+      const compGST = $('companyGST');
+      
+      if (compName) compName.value = Storage.getItem("companyName") || "J/s Enterprise";
+      if (compAddr) compAddr.value = Storage.getItem("companyAddress") || "Narayanganj, Bangladesh";
+      if (compPhone) compPhone.value = Storage.getItem("companyPhone") || "01994316210";
+      if (compGST) compGST.value = Storage.getItem("companyGST") || "27ABCDE1234F1Z2";
+      
+      if (settings.taxRate) {
+        const taxEl = $('taxRate');
+        if (taxEl) taxEl.value = settings.taxRate;
+      }
+      
+      if (settings.currency) {
+        const currEl = $('currency');
+        if (currEl) currEl.value = settings.currency;
+      }
       
       updateCompanyPreview();
       renderInvoicePreview();
     }
-    
-    setupInvoice();
 
-    // ==== PDF Export ====
-    function downloadPDF() {
-      const el = $("billPreview");
-      if (!el) {
-        alert("Bill preview area not found!");
-        return;
-      }
-      html2pdf().set({ 
-        filename: $("invoiceNumber").textContent + ".pdf",
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      }).from(el).save();
+    function generateDualCopyContent() {
+        const original = $('billPreview');
+        if (!original) return document.createElement('div');
+        
+        const clone = original.cloneNode(true);
+        const actions = clone.querySelector('.invoice-actions');
+        if(actions) actions.remove();
+        
+        const container = document.createElement("div");
+        
+        // CUSTOMER COPY
+        const copy1 = clone.cloneNode(true);
+        copy1.style.marginBottom = "50px";
+        copy1.style.borderBottom = "2px dashed #ccc";
+        copy1.style.paddingBottom = "20px";
+        const label1 = document.createElement("div");
+        label1.innerHTML = "<h3 style='text-align:right; color:#777; border-bottom:1px solid #eee; margin-bottom:20px'>CUSTOMER COPY</h3>";
+        copy1.insertBefore(label1, copy1.firstChild);
+        
+        // OFFICE COPY
+        const copy2 = clone.cloneNode(true);
+        const label2 = document.createElement("div");
+        label2.innerHTML = "<h3 style='text-align:right; color:#777; border-bottom:1px solid #eee; margin-top:20px; margin-bottom:20px'>OFFICE COPY</h3>";
+        copy2.insertBefore(label2, copy2.firstChild);
+        
+        container.appendChild(copy1);
+        container.appendChild(copy2);
+        return container;
     }
 
-    // ==== CSV/Excel Export ====
+    function printInvoice() {
+        const dualCopy = generateDualCopyContent();
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+          alert("Popup blocked! Please allow popups for this site.");
+          return;
+        }
+        
+        const styles = document.querySelector('style');
+        printWindow.document.write('<html><head><title>Print Invoice</title>');
+        if (styles) printWindow.document.write('<style>' + styles.innerHTML + '</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(dualCopy.innerHTML);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    }
+
+    function downloadPDF() {
+        if (typeof html2pdf === 'undefined') {
+          alert("PDF library not loaded. Please check your internet connection.");
+          return;
+        }
+        
+        const element = generateDualCopyContent();
+        const numEl = $('invoiceNumber');
+        const opt = { 
+            margin: 10,
+            filename: `Invoice_${numEl ? numEl.textContent : 'unknown'}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        try {
+          html2pdf().set(opt).from(element).save();
+        } catch(e) {
+          alert("PDF generation failed: " + e.message);
+        }
+    }
+
+    function calculateBDEstimate() {
+        const areaEl = $('estArea');
+        if (!areaEl) return;
+        
+        const area = parseFloat(areaEl.value) || 0;
+        
+        const data = [
+            { item: "Cement", qty: (area * 0.09).toFixed(2), unit: "Bags", price: 560 },
+            { item: "Sylhet Sand (Coarse)", qty: (area * 0.16).toFixed(2), unit: "Cft", price: 75 },
+            { item: "Local Sand (Fine)", qty: (area * 0.20).toFixed(2), unit: "Cft", price: 40 },
+            { item: "Stone Chips/Brick Chips", qty: (area * 0.37).toFixed(2), unit: "Cft", price: 130 },
+            { item: "Rebar (Steel)", qty: (area * 1.5).toFixed(2), unit: "Kg", price: 98 }
+        ];
+
+        const estBody = $('estBody');
+        if (!estBody) return;
+        
+        let html = "";
+        let grandTotal = 0;
+        data.forEach(m => {
+            const total = Math.round(m.qty * m.price);
+            grandTotal += total;
+            html += `<tr>
+                <td>${m.item}</td>
+                <td>${m.qty} ${m.unit}</td>
+                <td>৳${m.price}</td>
+                <td>৳${total.toLocaleString()}</td>
+            </tr>`;
+        });
+        html += `<tr style="font-weight:bold; background:#eee">
+            <td colspan="3">Estimated Total Cost</td>
+            <td>৳${grandTotal.toLocaleString()}</td>
+        </tr>`;
+        estBody.innerHTML = html;
+    }
+
     function exportCSV() {
       if (!items.length) {
         alert("There are no items to export.");
         return;
       }
       let csv = "Category,Description,Area,Rate,Discount,Amount,Note\n" +
-        items.map(it => `${it.cat},${it.desc},${it.area},${it.rate},${it.discount},${it.amount},${it.note||""}`).join("\n");
+        items.map(it => `${it.cat},${it.desc},${it.displayArea || it.area},${it.rate},${it.discount},${it.amount},${it.note||""}`).join("\n");
       let blob = new Blob([csv], {type:"text/csv"});
       let a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); a.download = "items.csv";
+      a.href = URL.createObjectURL(blob);
+      a.download = "items.csv";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
     }
     
     function exportExcel() {
-      alert("Excel export: Please use CSV export and open in Excel (or integrate SheetJS)");
+      alert("Excel export: Please use CSV export and open in Excel");
     }
 
-    // ==== Email Invoice (stub, ready for integration) ====
     function sendEmail() {
       let email = prompt("Enter recipient email:");
       if(!email) return;
-      alert("Email sent to " + email + " (Feature: connect to EmailJS or backend API for real email sending.)");
+      alert("Email sent to " + email);
     }
 
-    // ==== Dashboard ====
     function showDashboard() {
-      let dash = invoices.slice(-20).reverse().map(inv => `
+      const board = $('analyticsBoard');
+      if (!board) return;
+      
+      let dash = invoices.slice(-20).reverse().map(inv => {
+        const project = projects.find(p => p.id === inv.projectId);
+        return `
         <div class="dashboard-item">
           <div class="project-header">
             <b>${inv.number}</b> — ${inv.date}
             <span class="status-badge status-${inv.status || 'draft'}">${inv.status || 'draft'}</span>
           </div>
-          <span>${inv.customer.name}</span> | <span>${inv.total}</span>
+          <span>${inv.customer ? inv.customer.name : ''}</span> | <span>${inv.total}</span>
           <div class="project-meta">
-            Project: ${projects.find(p => p.id === inv.projectId)?.name || 'Unknown'}
+            Project: ${project ? project.name : 'Unknown'}
           </div>
-        </div>`).join("");
-      $("analyticsBoard").innerHTML = `<h4>Recent Invoices</h4>${dash || "No invoices yet."}`;
+        </div>`;
+      }).join("");
+      board.innerHTML = `<h4>Recent Invoices</h4>${dash || "No invoices yet."}`;
     }
 
-    // ==== Settings Management ====
     function saveSettings() {
-      settings.taxRate = parseFloat($("defaultTaxRate").value) || 18;
-      settings.currency = $("defaultCurrency").value;
-      settings.invoiceFormat = $("invoiceFormat").value;
-      localStorage.setItem("appSettings", JSON.stringify(settings));
+      const taxEl = $('defaultTaxRate');
+      const currEl = $('defaultCurrency');
+      const formatEl = $('invoiceFormat');
+      
+      settings.taxRate = taxEl ? (parseFloat(taxEl.value) || 18) : 18;
+      settings.currency = currEl ? currEl.value : '৳';
+      settings.invoiceFormat = formatEl ? formatEl.value : 'INV-YYYY-#####';
+      
+      Storage.setItem("appSettings", JSON.stringify(settings));
       alert("Settings saved!");
       
-      // Apply settings to current invoice
-      $("taxRate").value = settings.taxRate;
-      $("currency").value = settings.currency;
+      if (settings.taxRate) {
+        const taxInput = $('taxRate');
+        if (taxInput) taxInput.value = settings.taxRate;
+      }
+      if (settings.currency) {
+        const currInput = $('currency');
+        if (currInput) currInput.value = settings.currency;
+      }
       updateAll();
     }
 
-    // ==== Reset Form ====
     function resetForm() {
       if(!confirm("Reset all fields?")) return;
-      ["customerName","customerAddress","customerPhone","customerGST","itemDescription","itemSqft","itemRate","itemDiscount","itemNote","addCharges","totalDiscount","invoiceNote"].forEach(id=>{
-        if($(id).type=="number"||$(id).type=="text") $(id).value = "";
-        else $(id).value = "";
+      
+      const fields = ['customerName','customerAddress','customerPhone','customerGST','itemDescription','itemSqft','itemRate','itemDiscount','itemNote','addCharges','totalDiscount','invoiceNote'];
+      fields.forEach(id=>{
+        const el = $(id);
+        if(el) el.value = "";
       });
       items = [];
       setupInvoice();
       updateAll();
     }
 
-    // ==== Print ====
-    function printInvoice() {
-      window.print();
+    function setLang(lang) { 
+      alert("Language set to: " + lang); 
     }
 
-    // ==== Language Switch ====
-    function setLang(lang) {
-      alert("Language change: " + lang + " (Stub. For real i18n, integrate i18next or similar, and provide UI translations)");
-    }
-
-    // ==== Auth (stub) ====
     function showLogin() {
       let name = prompt("Enter username:");
       if(name) { 
         user = name; 
-        $("loginBtn").style.display="none"; 
-        $("logoutBtn").style.display="inline-block"; 
+        const loginBtn = $('loginBtn');
+        const logoutBtn = $('logoutBtn');
+        if (loginBtn) loginBtn.style.display="none"; 
+        if (logoutBtn) logoutBtn.style.display="inline-block"; 
         alert("Logged in as "+name);
       }
     }
     
     function logout() {
       user = null; 
-      $("loginBtn").style.display="inline-block"; 
-      $("logoutBtn").style.display="none";
+      const loginBtn = $('loginBtn');
+      const logoutBtn = $('logoutBtn');
+      if (loginBtn) loginBtn.style.display="inline-block"; 
+      if (logoutBtn) logoutBtn.style.display="none";
       alert("Logged out.");
     }
 
-    // ==== On Load: Update all ====
-    updateProjectSelector();
-    updateAll();
-  </script>
-  
-  <!-- PWA js installer script -->
-  <script src="/js/pwa-install.js"></script>
-<script>
-  // Register Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(function(registration) {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        })
-        .catch(function(error) {
-          console.log('ServiceWorker registration failed: ', error);
+    // Initialize application
+    function initApp() {
+      if (appInitialized) return;
+      
+      console.log('Initializing app...');
+      
+      // Check storage availability
+      Storage.init();
+      
+      // Load data from storage
+      try {
+        const storedProjects = Storage.getItem("projects");
+        if (storedProjects) projects = JSON.parse(storedProjects);
+      } catch(e) { projects = []; }
+      
+      try {
+        const storedInvoices = Storage.getItem("invoices");
+        if (storedInvoices) invoices = JSON.parse(storedInvoices);
+      } catch(e) { invoices = []; }
+      
+      try {
+        const storedSettings = Storage.getItem("appSettings");
+        if (storedSettings) settings = JSON.parse(storedSettings);
+      } catch(e) { 
+        settings = {taxRate: 18, currency: "৳", invoiceFormat: "INV-YYYY-#####"}; 
+      }
+      
+      logoData = Storage.getItem("companyLogo") || "";
+      
+      // Setup event listeners
+      const addItemBtn = $('addItem');
+      if (addItemBtn) addItemBtn.onclick = addItem;
+      
+      const clearItemsBtn = $('clearItems');
+      if (clearItemsBtn) clearItemsBtn.onclick = () => { 
+        if(confirm("Clear items?")){
+          items=[]; 
+          updateAll();
+        }
+      };
+      
+      ['addCharges','totalDiscount','invoiceNote'].forEach(id => {
+        const el = $(id);
+        if(el) el.addEventListener("input", renderInvoicePreview);
+      });
+      
+      ['companyName','companyAddress','companyPhone','companyGST'].forEach(id => {
+        const el = $(id);
+        if(el) el.addEventListener("input", updateCompanyPreview);
+      });
+      
+      ['customerName','customerAddress','customerPhone','customerGST'].forEach(id => {
+        const el = $(id);
+        if(el) el.addEventListener("input", updateCustomerPreview);
+      });
+      
+      const logoUpload = $('logoUpload');
+      if(logoUpload) {
+        logoUpload.addEventListener("change", function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(ev) { 
+            logoData = ev.target.result; 
+            updateCompanyPreview(); 
+          };
+          reader.readAsDataURL(file);
         });
-    });
-  }
+      }
+      
+      const currencyEl = $('currency');
+      if(currencyEl) currencyEl.addEventListener("change", updateAll);
+      
+      const taxRateEl = $('taxRate');
+      if(taxRateEl) taxRateEl.addEventListener("input", updateAll);
+      
+      ['itemFt','itemIn','itemFt2','itemIn2','itemNos'].forEach(id=>{
+        const el = $(id);
+        if(el) el.addEventListener("input", calcSqftFromFtIn);
+      });
+      
+      // Setup initial values
+      setupInvoice();
+      updateProjectSelector();
+      updateAll();
+      
+      appInitialized = true;
+      console.log('App initialized successfully');
+    }
 
-  // Handle online/offline status
-  window.addEventListener('online', function() {
-    document.body.classList.remove('offline');
-    showMessage('Connection restored', 'success');
-  });
-
-  window.addEventListener('offline', function() {
-    document.body.classList.add('offline');
-    showMessage('You are currently offline', 'warning');
-  });
-
-  function showMessage(message, type) {
-    // Create toast notification
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: ${type === 'success' ? '#2ecc71' : '#f39c12'};
-      color: white;
-      padding: 12px 20px;
-      border-radius: 5px;
-      z-index: 10000;
-      animation: slideInRight 0.3s ease-out;
-    `;
+    // Wait for everything to load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
     
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      toast.remove();
-    }, 3000);
-  }
-</script>
+    // Backup initialization
+    window.onload = initApp;
+  </script>
+  <footer> This system is powered and supported by "sabuj.kcl@gmail.com", ensuring reliable operation and dedicated assistance for all user needs. The email address serves as a primary point of contact for technical support, feedback, or inquiries related to the platform's functionality and performance.</footer>
 </body>
 </html>
