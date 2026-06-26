@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শাটারিং এবং ফর্মওয়ার্ক ক্যালকুলেটর - বাংলাদেশ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: #e94560;
+            text-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+            margin-bottom: 10px;
+        }
+
+        header h2 {
+            font-size: 1.4rem;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #a0a0a0;
+            font-size: 1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: #e94560;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0b0b0;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(233, 69, 96, 0.2);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #e94560;
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.2);
+        }
+
+        .input-group input::placeholder {
+            color: #666;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #e94560, #c73e54);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.1), rgba(15, 52, 96, 0.3));
+            border: 1px solid rgba(233, 69, 96, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .result-card .label {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-card .value {
+            color: #e94560;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .result-card .unit {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .breakdown-table th,
+        .breakdown-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .breakdown-table th {
+            color: #e94560;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .breakdown-table td {
+            color: #d0d0d0;
+        }
+
+        .breakdown-table tr:hover td {
+            background: rgba(233, 69, 96, 0.05);
+        }
+
+        .total-row {
+            background: rgba(233, 69, 96, 0.1) !important;
+        }
+
+        .total-row td {
+            color: #e94560 !important;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .info-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #ffc107;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .formula-box {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .formula-box strong {
+            color: #00ff88;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .formula-box ul {
+            margin-left: 20px;
+            color: #b0b0b0;
+        }
+
+        .formula-box li {
+            margin-bottom: 5px;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .preset-btn {
+            padding: 8px 16px;
+            background: rgba(233, 69, 96, 0.15);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            border-radius: 8px;
+            color: #e94560;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(233, 69, 96, 0.3);
+        }
+
+        .visual-diagram {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .visual-diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #a0a0a0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: rgba(233, 69, 96, 0.2);
+            border-color: #e94560;
+            color: #e94560;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ শাটারিং এবং ফর্মওয়ার্ক ক্যালকুলেটর</h1>
+            <h2>বাংলাদেশ কনস্ট্রাকশন</h2>
+            <p>মোট জমির পরিমাণ থেকে ফর্মওয়ার্কের প্রয়োজনীয়তা হিসাব করুন</p>
+        </header>
+
+        <div class="main-grid">
+            <div class="card">
+                <h2>📐 ইনপুট প্যারামিটার</h2>
+
+                <div class="preset-buttons">
+                    <button class="preset-btn" onclick="setPreset(600)">৩ শতক (৬০০ sqft)</button>
+                    <button class="preset-btn" onclick="setPreset(800)">৪ শতক (৮০০ sqft)</button>
+                    <button class="preset-btn" onclick="setPreset(1000)">৫ শতক (১০০০ sqft)</button>
+                    <button class="preset-btn" onclick="setPreset(1200)">৬ শতক (১২০০ sqft)</button>
+                    <button class="preset-btn" onclick="setPreset(1500)">৭.৫ শতক (১৫০০ sqft)</button>
+                    <button class="preset-btn" onclick="setPreset(2000)">১০ শতক (২০০০ sqft)</button>
+                    <button class="preset-btn" onclick="setPreset(2400)">১২ শতক (২৪০০ sqft)</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="landArea">মোট জমির পরিমাণ (Land Area)</label>
+                    <div class="input-row">
+                        <input type="number" id="landArea" placeholder="যেমন: 1200" value="1200" min="100" oninput="calculateFormwork()">
+                        <select id="areaUnit" onchange="calculateFormwork()">
+                            <option value="sqft">বর্গফুট (sq ft)</option>
+                            <option value="sqm">বর্গমিটার (sq m)</option>
+                            <option value="sqyd">বর্গগজ (sq yd)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="floors">তলার সংখ্যা (Number of Floors)</label>
+                    <input type="number" id="floors" placeholder="যেমন: 2" value="2" min="1" max="20" oninput="calculateFormwork()">
+                </div>
+
+                <div class="input-group">
+                    <label for="floorHeight">তলা থেকে তলা উচ্চতা (Floor-to-Floor Height)</label>
+                    <div class="input-row">
+                        <input type="number" id="floorHeight" placeholder="যেমন: 10" value="10" min="6" max="20" oninput="calculateFormwork()">
+                        <select id="heightUnit" onchange="calculateFormwork()">
+                            <option value="ft">ফুট (feet)</option>
+                            <option value="m">মিটার (meters)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="buildingType">বিল্ডিং টাইপ (Building Type)</label>
+                    <select id="buildingType" onchange="calculateFormwork()">
+                        <option value="residential">আবাসিক (Residential)</option>
+                        <option value="commercial">বাণিজ্যিক (Commercial)</option>
+                        <option value="industrial">শিল্প/গুদাম (Industrial/Warehouse)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="setback">সেটব্যাক / খোলা জায়গা (%) (Setback / Open Area)</label>
+                    <input type="number" id="setback" placeholder="যেমন: 25" value="25" min="0" max="60" oninput="calculateFormwork()">
+                </div>
+
+                <div class="input-group">
+                    <label for="columnSpacing">কলামের দূরত্ব (Column Spacing)</label>
+                    <div class="input-row">
+                        <input type="number" id="columnSpacing" placeholder="যেমন: 15" value="15" min="10" max="30" oninput="calculateFormwork()">
+                        <select id="spacingUnit" onchange="calculateFormwork()">
+                            <option value="ft">ফুট (feet)</option>
+                            <option value="m">মিটার (meters)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="beamDepth">বিমের গভীরতা (Beam Depth)</label>
+                    <div class="input-row">
+                        <input type="number" id="beamDepth" placeholder="যেমন: 18" value="18" min="12" max="36" oninput="calculateFormwork()">
+                        <select id="beamUnit" onchange="calculateFormwork()">
+                            <option value="in">ইঞ্চি (inches)</option>
+                            <option value="cm">সেমি (cm)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="slabThickness">স্ল্যাবের পুরুত্ব (Slab Thickness)</label>
+                    <div class="input-row">
+                        <input type="number" id="slabThickness" placeholder="যেমন: 5" value="5" min="4" max="12" oninput="calculateFormwork()">
+                        <select id="slabUnit" onchange="calculateFormwork()">
+                            <option value="in">ইঞ্চি (inches)</option>
+                            <option value="cm">সেমি (cm)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calculateFormwork()">🚀 শাটারিং হিসাব করুন</button>
+
+                <div class="info-box">
+                    <strong>💡 নোট:</strong>
+                    এই ক্যালকুলেটর স্ট্যান্ডার্ড ইঞ্জিনিয়ারিং ধারণা ব্যবহার করে। প্রকৃত প্রয়োজনীয়তা স্থাপত্য নকশা, স্থানীয় বিধি এবং কাঠামোগত প্রয়োজনীয়তার উপর নির্ভর করে পরিবর্তিত হতে পারে।
+                    <br><br>
+                    <strong>💰 দামের নোট:</strong> সকল দাম বাংলাদেশি টাকা (৳) এ। দামগুলো ২০২৬ সালের আনুমানিক বাজার মূল্যের উপর ভিত্তি করে তৈরি।
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📋 হিসাবের ধারণা (Calculation Assumptions)</h2>
+
+                <div class="formula-box">
+                    <strong>🏗️ বিল্ট-আপ এরিয়া হিসাব:</strong>
+                    <ul>
+                        <li>বিল্ট-আপ এরিয়া = জমির পরিমাণ × (১ − সেটব্যাক%)</li>
+                        <li>আবাসিকের জন্য টাইপিক্যাল সেটব্যাক: ২০-৩০%</li>
+                        <li>প্লিন্থ এরিয়া ≈ বিল্ট-আপ এরিয়ার ৮৫-৯০%</li>
+                    </ul>
+                </div>
+
+                <div class="formula-box">
+                    <strong>📐 শাটারিং এরিয়া ফর্মুলা:</strong>
+                    <ul>
+                        <li><strong>স্ল্যাব শাটারিং:</strong> প্লিন্থ এরিয়া × ১.০ (উপরের পৃষ্ঠ)</li>
+                        <li><strong>বিম শাটারিং:</strong> বিম দৈর্ঘ্য × (২ × গভীরতা + প্রস্থ) × বিম সংখ্যা</li>
+                        <li><strong>কলাম শাটারিং:</strong> কলাম পরিধি × উচ্চতা × কলাম সংখ্যা</li>
+                        <li><strong>দেয়াল শাটারিং:</strong> দেয়াল দৈর্ঘ্য × উচ্চতা × ২ (উভয় পাশ)</li>
+                        <li><strong>সিঁড়ি:</strong> মোট শাটারিং এরিয়ার ~৫-৮%</li>
+                    </ul>
+                </div>
+
+                <div class="formula-box">
+                    <strong>🪵 বাংলাদেশের উপকরণের হার (প্রতি sqm শাটারিং):</strong>
+                    <ul>
+                        <li>প্লাইউড (১২মিমি): ২.৫ sqm — ৳ ১২০-১৮০/sqm</li>
+                        <li>কাঠের ব্যাটেন (২"×৩"): ২.৫ মিটার — ৳ ১৫-২০/ফুট</li>
+                        <li>বাঁশ/বল্লি (৩" ডায়া): ৩টি — ৳ ১০-১৫/ফুট</li>
+                        <li>পেরেক: ০.২৫ কেজি — ৳ ১২০-১৫০/কেজি</li>
+                        <li>শাটারিং তেল: ০.১ লিটার — ৳ ২০০-৩ณ์০/লিটার</li>
+                    </ul>
+                </div>
+
+                <div class="formula-box">
+                    <strong>⚙️ বাংলাদেশের স্ট্যান্ডার্ড অনুপাত:</strong>
+                    <ul>
+                        <li>কলাম ঘনত্ব: প্রতি ১৫০-২৫০ sqft প্লিন্থে ১টি</li>
+                        <li>বিম: প্রতি ৮-১০ sqft প্লিন্থে ১ লিনিয়ার ফুট</li>
+                        <li>দেয়াল উচ্চতা: তলা উচ্চতা − স্ল্যাব পুরুত্ব</li>
+                        <li>নষ্টের হার: ১০-১৫%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card results-section" id="resultsSection">
+            <h2>📊 হিসাবের ফলাফল</h2>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showTab(event, 'summary')">সারাংশ</button>
+                <button class="tab-btn" onclick="showTab(event, 'detailed')">বিস্তারিত বিভাজন</button>
+                <button class="tab-btn" onclick="showTab(event, 'materials')">উপকরণ ও খরচ</button>
+                <button class="tab-btn" onclick="showTab(event, 'visual')">ভিজ্যুয়াল</button>
+            </div>
+
+            <div class="tab-content active" id="summaryTab">
+                <div class="result-grid" id="summaryGrid">
+                    </div>
+            </div>
+
+            <div class="tab-content" id="detailedTab">
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>উপাদান</th>
+                            <th>পরিমাণ</th>
+                            <th>একক</th>
+                            <th>শাটারিং এরিয়া</th>
+                            <th>মোটের %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdownBody">
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="tab-content" id="materialsTab">
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>উপকরণ</th>
+                            <th>পরিমাণ</th>
+                            <th>একক</th>
+                            <th>আনুমানিক খরচ (৳)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materialsBody">
+                        </tbody>
+                </table>
+                <div class="info-box" style="margin-top: 15px;">
+                    <strong>💰 দামের নোট:</strong> উপকরণের দাম আনুমানিক এবং অঞ্চলভেদে পরিবর্তিত হতে পারে। প্লাইউড: ৳ ১২০-১৮০/sqm, কাঠ: ৳ ১৫-২০/ফুট, পেরেক: ৳ ১২০-১৫০/কেজি, তেল: ৳ ২০০-৩০০/লিটার।
+                </div>
+            </div>
+
+            <div class="tab-content" id="visualTab">
+                <div class="visual-diagram" id="visualDiagram">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BANGLADESH-SPECIFIC PRICES (BDT) - 2026 estimates
+        const BD_PRICES = {
+            plywoodPerSqm: 150,      
+            timberPerMeter: 55,      
+            balliesPerPiece: 45,     
+            nailsPerKg: 135,         
+            oilPerLiter: 250         
+        };
+
+        function toSqft(value, unit) {
+            const conversions = { sqft: 1, sqm: 10.764, sqyd: 9 };
+            return value * conversions[unit];
+        }
+
+        function toFt(value, unit) {
+            return unit === 'm' ? value * 3.281 : value;
+        }
+
+        function toIn(value, unit) {
+            return unit === 'cm' ? value / 2.54 : value;
+        }
+
+        function sqftToSqm(sqft) {
+            return sqft / 10.764;
+        }
+
+        function setPreset(area) {
+            document.getElementById('landArea').value = area;
+            calculateFormwork();
+        }
+
+        function showTab(evt, tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            evt.currentTarget.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function calculateFormwork() {
+            const landArea = parseFloat(document.getElementById('landArea').value) || 0;
+            const areaUnit = document.getElementById('areaUnit').value;
+            const floors = parseInt(document.getElementById('floors').value) || 1;
+            const floorHeight = parseFloat(document.getElementById('floorHeight').value) || 10;
+            const heightUnit = document.getElementById('heightUnit').value;
+            const buildingType = document.getElementById('buildingType').value;
+            const setback = parseFloat(document.getElementById('setback').value) || 25;
+            const columnSpacing = parseFloat(document.getElementById('columnSpacing').value) || 15;
+            const spacingUnit = document.getElementById('spacingUnit').value;
+            const beamDepth = parseFloat(document.getElementById('beamDepth').value) || 18;
+            const beamUnit = document.getElementById('beamUnit').value;
+            const slabThickness = parseFloat(document.getElementById('slabThickness').value) || 5;
+            const slabUnit = document.getElementById('slabUnit').value;
+
+            const landAreaSqft = toSqft(landArea, areaUnit);
+            const floorHeightFt = toFt(floorHeight, heightUnit);
+            const columnSpacingFt = toFt(columnSpacing, spacingUnit);
+            const beamDepthIn = toIn(beamDepth, beamUnit);
+            const slabThicknessIn = toIn(slabThickness, slabUnit);
+            const beamDepthFt = beamDepthIn / 12;
+            const slabThicknessFt = slabThicknessIn / 12;
+
+            // Type Multiplier Logic
+            let typeMultiplier = 1.0;
+            if (buildingType === 'commercial') typeMultiplier = 1.2;
+            if (buildingType === 'industrial') typeMultiplier = 1.35;
+
+            const builtUpAreaSqft = landAreaSqft * (1 - setback / 100);
+            const plinthAreaSqft = builtUpAreaSqft * 0.88; 
+            const plinthAreaSqm = sqftToSqm(plinthAreaSqft);
+
+            const buildingSideFt = Math.sqrt(plinthAreaSqft);
+
+            // Dynamic Column Width based on Floor Count
+            let columnWidthFt = 1.0; 
+            if (floors > 3 && floors <= 6) columnWidthFt = 1.25; // 15" columns
+            if (floors > 6) columnWidthFt = 1.5; // 18" columns
+
+            const columnsPerRow = Math.ceil(buildingSideFt / columnSpacingFt) + 1;
+            const totalColumns = columnsPerRow * columnsPerRow;
+            const columnHeightFt = floorHeightFt;
+            const columnPerimeterFt = 4 * columnWidthFt;
+            const totalColumnShutteringSqft = totalColumns * columnPerimeterFt * columnHeightFt * floors;
+
+            const beamsPerDirection = columnsPerRow;
+            const beamLengthPerFloorFt = beamsPerDirection * buildingSideFt * 2;
+            const totalBeamLengthFt = beamLengthPerFloorFt * floors * typeMultiplier;
+            const beamWidthFt = 0.75; 
+            const beamShutteringPerFt = 2 * beamDepthFt + beamWidthFt;
+            const totalBeamShutteringSqft = totalBeamLengthFt * beamShutteringPerFt;
+
+            const totalSlabShutteringSqft = plinthAreaSqft * floors;
+
+            const wallHeightFt = floorHeightFt - slabThicknessFt;
+            const totalWallLengthFt = buildingSideFt * 4 * floors * (buildingType === 'industrial' ? 1.5 : 1.0);
+            const totalWallShutteringSqft = totalWallLengthFt * wallHeightFt * 2; 
+
+            let staircaseShutteringSqft = 0;
+            if (floors > 1) {
+                const staircases = Math.ceil(plinthAreaSqft / 2000); 
+                const stairWidthFt = 3.5;
+                const stairRiseFt = floorHeightFt;
+                const stairRunFt = Math.sqrt(floorHeightFt) * 4; 
+                const stairSlantFt = Math.sqrt(stairRiseFt * stairRiseFt + stairRunFt * stairRunFt);
+                staircaseShutteringSqft = staircases * (stairWidthFt * stairSlantFt + stairWidthFt * stairRiseFt) * (floors - 1) * 2;
+            }
+
+            const foundationShutteringSqft = buildingSideFt * 4 * 2 * 1.5; 
+
+            let totalShutteringSqft = totalColumnShutteringSqft + totalBeamShutteringSqft + 
+                                     totalSlabShutteringSqft + totalWallShutteringSqft + 
+                                     staircaseShutteringSqft + foundationShutteringSqft;
+
+            const wastageFactor = 1.12;
+            const totalWithWastageSqft = totalShutteringSqft * wastageFactor;
+            const totalWithWastageSqm = sqftToSqm(totalWithWastageSqft);
+
+            const shutteringSqm = totalWithWastageSqm;
+            const plywoodSqm = shutteringSqm * 2.5;
+            const timberMeters = shutteringSqm * 2.5;
+            const balliesCount = Math.ceil(shutteringSqm * 3);
+            const nailsKg = shutteringSqm * 0.25;
+            const oilLiters = shutteringSqm * 0.1;
+
+            const plywoodCost = plywoodSqm * BD_PRICES.plywoodPerSqm;
+            const timberCost = timberMeters * BD_PRICES.timberPerMeter;
+            const balliesCost = balliesCount * BD_PRICES.balliesPerPiece;
+            const nailsCost = nailsKg * BD_PRICES.nailsPerKg;
+            const oilCost = oilLiters * BD_PRICES.oilPerLiter;
+            const totalCost = plywoodCost + timberCost + balliesCost + nailsCost + oilCost;
+
+            const results = {
+                landAreaSqft,
+                builtUpAreaSqft,
+                plinthAreaSqft,
+                plinthAreaSqm,
+                floors,
+                floorHeightFt,
+                buildingSideFt,
+                totalColumns,
+                totalBeamLengthFt,
+                components: [
+                    { name: 'কলাম শাটারিং (Column)', qty: totalColumns * floors, unit: 'টি', area: totalColumnShutteringSqft },
+                    { name: 'বিম শাটারিং (Beam)', qty: Math.round(totalBeamLengthFt), unit: 'ফুট', area: totalBeamShutteringSqft },
+                    { name: 'স্ল্যাব শাটারিং (Slab)', qty: Math.round(totalSlabShutteringSqft), unit: 'বর্গফুট', area: totalSlabShutteringSqft },
+                    { name: 'দেয়াল শাটারিং (Wall)', qty: Math.round(totalWallLengthFt), unit: 'ফুট', area: totalWallShutteringSqft },
+                    { name: 'সিঁড়ি শাটারিং (Staircase)', qty: floors > 1 ? floors - 1 : 0, unit: 'ফ্লাইট', area: staircaseShutteringSqft },
+                    { name: 'ফাউন্ডেশন/প্লিন্থ (Foundation)', qty: 1, unit: 'সেট', area: foundationShutteringSqft }
+                ],
+                totalShutteringSqft,
+                totalWithWastageSqft,
+                totalWithWastageSqm,
+                materials: [
+                    { name: 'প্লাইউড (১২মিми) (Plywood)', qty: Math.round(plywoodSqm), unit: 'বর্গমিটার', cost: Math.round(plywoodCost) },
+                    { name: 'কাঠের ব্যাটেন (২"×৩") (Timber)', qty: Math.round(timberMeters), unit: 'মিটার', cost: Math.round(timberCost) },
+                    { name: 'বাঁশ/বল্লি (৩" ডায়া) (Bamboo/Ballies)', qty: balliesCount, unit: 'টি', cost: Math.round(balliesCost) },
+                    { name: 'পেরেক (Nails)', qty: Math.round(nailsKg * 10) / 10, unit: 'কেজি', cost: Math.round(nailsCost) },
+                    { name: 'শাটারিং তেল (Shuttering Oil)', qty: Math.round(oilLiters * 10) / 10, unit: 'লিটার', cost: Math.round(oilCost) },
+                    { name: 'মোট খরচ (TOTAL)', qty: '-', unit: '-', cost: Math.round(totalCost) }
+                ]
+            };
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            document.getElementById('resultsSection').classList.add('active');
+
+            const summaryGrid = document.getElementById('summaryGrid');
+            summaryGrid.innerHTML = `
+                <div class="result-card">
+                    <div class="label">মোট জমি (Land Area)</div>
+                    <div class="value">${Math.round(results.landAreaSqft).toLocaleString('bn-BD')}</div>
+                    <div class="unit">বর্গফুট</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">বিল্ট-আপ এরিয়া</div>
+                    <div class="value">${Math.round(results.builtUpAreaSqft).toLocaleString('bn-BD')}</div>
+                    <div class="unit">বর্গফুট</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">প্লিন্থ এরিয়া</div>
+                    <div class="value">${Math.round(results.plinthAreaSqft).toLocaleString('bn-BD')}</div>
+                    <div class="unit">বর্গফুট (${Math.round(results.plinthAreaSqm).toLocaleString('bn-BD')} বর্গমিটার)</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">মোট কলাম</div>
+                    <div class="value">${(results.totalColumns * results.floors).toLocaleString('bn-BD')}</div>
+                    <div class="unit">টি (${results.floors} তলা)</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">মোট বিম দৈর্ঘ্য</div>
+                    <div class="value">${Math.round(results.totalBeamLengthFt).toLocaleString('bn-BD')}</div>
+                    <div class="unit">লিনিয়ার ফুট</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">মোট শাটারিং</div>
+                    <div class="value">${Math.round(results.totalWithWastageSqft).toLocaleString('bn-BD')}</div>
+                    <div class="unit">বর্গফুট (${Math.round(results.totalWithWastageSqm).toLocaleString('bn-BD')} বর্গমিটার)</div>
+                </div>
+            `;
+
+            const breakdownBody = document.getElementById('breakdownBody');
+            let breakdownHTML = '';
+            results.components.forEach(comp => {
+                const pct = ((comp.area / results.totalShutteringSqft) * 100).toFixed(1);
+                breakdownHTML += `
+                    <tr>
+                        <td>${comp.name}</td>
+                        <td>${comp.qty.toLocaleString('bn-BD')}</td>
+                        <td>${comp.unit}</td>
+                        <td>${Math.round(comp.area).toLocaleString('bn-BD')} বর্গফুট</td>
+                        <td>${pct}%</td>
+                    </tr>
+                `;
+            });
+            breakdownHTML += `
+                <tr class="total-row">
+                    <td>সাবটোটাল</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>${Math.round(results.totalShutteringSqft).toLocaleString('bn-BD')} বর্গফুট</td>
+                    <td>100%</td>
+                </tr>
+                <tr class="total-row">
+                    <td>নষ্টসহ (১২%)</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>${Math.round(results.totalWithWastageSqft).toLocaleString('bn-BD')} বর্গফুট</td>
+                    <td>112%</td>
+                </tr>
+            `;
+            breakdownBody.innerHTML = breakdownHTML;
+
+            const materialsBody = document.getElementById('materialsBody');
+            let materialsHTML = '';
+            results.materials.forEach((mat) => {
+                const isTotal = mat.name === 'মোট খরচ (TOTAL)';
+                materialsHTML += `
+                    <tr class="${isTotal ? 'total-row' : ''}">
+                        <td>${mat.name}</td>
+                        <td>${mat.qty === '-' ? '-' : mat.qty.toLocaleString('bn-BD')}</td>
+                        <td>${mat.unit}</td>
+                        <td>৳ ${mat.cost.toLocaleString('bn-BD')}</td>
+                    </tr>
+                `;
+            });
+            materialsBody.innerHTML = materialsHTML;
+
+            const visualDiagram = document.getElementById('visualDiagram');
+            const side = Math.min(300, results.buildingSideFt / 2);
+            const colSize = Math.max(8, side / (Math.sqrt(results.totalColumns) + 1));
+
+            visualDiagram.innerHTML = `
+                <svg width="400" height="400" viewBox="0 0 400 400">
+                    <defs>
+                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(233,69,96,0.1)" stroke-width="1"/>
+                        </pattern>
+                    </defs>
+                    <rect x="0" y="0" width="400" height="400" fill="url(#grid)" rx="10"/>
+                    <rect x="20" y="20" width="360" height="360" fill="none" stroke="#e94560" stroke-width="2" stroke-dasharray="8,4" rx="5"/>
+                    <text x="200" y="15" text-anchor="middle" fill="#e94560" font-size="12" font-weight="bold">জমির পরিমাণ</text>
+                    <rect x="50" y="50" width="300" height="300" fill="rgba(233,69,96,0.05)" stroke="#e94560" stroke-width="1.5" rx="3"/>
+                    <text x="200" y="45" text-anchor="middle" fill="#e94560" font-size="11">বিল্ট-আপ এরিয়া</text>
+                    <rect x="70" y="70" width="260" height="260" fill="rgba(0,255,136,0.08)" stroke="#00ff88" stroke-width="2" rx="2"/>
+                    <text x="200" y="65" text-anchor="middle" fill="#00ff88" font-size="11" font-weight="bold">বিল্ডিং গ্রিড</text>
+                    ${generateColumnSVG(side, colSize, 70, 70, 260, results.totalColumns)}
+                    <g transform="translate(20, 380)">
+                        <rect x="0" y="0" width="12" height="12" fill="none" stroke="#e94560" stroke-dasharray="4,2"/>
+                        <text x="18" y="10" fill="#a0a0a0" font-size="10">জমি</text>
+                        <rect x="70" y="0" width="12" height="12" fill="rgba(0,255,136,0.3)" stroke="#00ff88"/>
+                        <text x="88" y="10" fill="#a0a0a0" font-size="10">বিল্ডিং</text>
+                        <rect x="150" y="2" width="8" height="8" fill="#e94560"/>
+                        <text x="164" y="10" fill="#a0a0a0" font-size="10">কলাম</text>
+                    </g>
+                    <text x="200" y="340" text-anchor="middle" fill="#888" font-size="10">
+                        ~${Math.round(results.buildingSideFt)} ফুট × ~${Math.round(results.buildingSideFt)} ফুট
+                    </text>
+                    <text x="200" y="355" text-anchor="middle" fill="#888" font-size="10">
+                        ${results.floors} তলা × ${Math.round(results.floorHeightFt)} ফুট উচ্চতা
+                    </text>
+                </svg>
+            `;
+        }
+
+        function generateColumnSVG(buildingSide, colSize, offsetX, offsetY, buildingSize, totalCols) {
+            const colsPerRow = Math.round(Math.sqrt(totalCols));
+            const spacing = buildingSize / (colsPerRow - 1 || 1);
+            let svg = '';
+
+            for (let i = 0; i < colsPerRow; i++) {
+                for (let j = 0; j < colsPerRow; j++) {
+                    const cx = offsetX + (j * spacing) - (colSize / 2);
+                    const cy = offsetY + (i * spacing) - (colSize / 2);
+                    svg += `<rect x="${cx}" y="${cy}" width="${colSize}" height="${colSize}" fill="#e94560" stroke="#fff" stroke-width="0.5" rx="1"/>`;
+                }
+            }
+            return svg;
+        }
+
+        window.onload = function() {
+            calculateFormwork();
+        };
+    </script>
+<footer><h2>©All Rights Reserved jsenterprise.netlify.com</h2>
+</footer>
+</body>
+</html>
